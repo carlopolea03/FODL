@@ -1,0 +1,10 @@
+C:\Files\My Files\SYSTEMS\FODL\FODL\FODLSystem\obj\Debug\netcoreapp3.0\FODLSystem.csproj.AssemblyReference.cache
+C:\Files\My Files\SYSTEMS\FODL\FODL\FODLSystem\obj\Debug\netcoreapp3.0\FODLSystem.Properties.Resources.resources
+C:\Files\My Files\SYSTEMS\FODL\FODL\FODLSystem\obj\Debug\netcoreapp3.0\FODLSystem.csproj.GenerateResource.cache
+C:\Files\My Files\SYSTEMS\FODL\FODL\FODLSystem\obj\Debug\netcoreapp3.0\FODLSystem.GeneratedMSBuildEditorConfig.editorconfig
+C:\Files\My Files\SYSTEMS\FODL\FODL\FODLSystem\obj\Debug\netcoreapp3.0\FODLSystem.AssemblyInfoInputs.cache
+C:\Files\My Files\SYSTEMS\FODL\FODL\FODLSystem\obj\Debug\netcoreapp3.0\FODLSystem.AssemblyInfo.cs
+C:\Files\My Files\SYSTEMS\FODL\FODL\FODLSystem\obj\Debug\netcoreapp3.0\FODLSystem.csproj.CoreCompileInputs.cache
+C:\Files\My Files\SYSTEMS\FODL\FODL\FODLSystem\obj\Debug\netcoreapp3.0\FODLSystem.MvcApplicationPartsAssemblyInfo.cs
+C:\Files\My Files\SYSTEMS\FODL\FODL\FODLSystem\obj\Debug\netcoreapp3.0\FODLSystem.MvcApplicationPartsAssemblyInfo.cache
+C:\Files\My Files\SYSTEMS\FODL\FODL\FODLSystem\obj\Debug\netcoreapp3.0\FODLSystem.sourcelink.json

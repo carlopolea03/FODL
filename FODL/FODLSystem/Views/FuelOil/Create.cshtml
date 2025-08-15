@@ -1,0 +1,1397 @@
+﻿
+@model FODLSystem.Models.FuelOil
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<style>
+    .error-input {
+        border-color: hsl(0, 76%, 50%) !important;
+    }
+
+    .modal-sm {
+        width: 40% !important
+    }
+
+    .modal-md {
+        width: 60% !important
+    }
+
+    .modal-lg {
+        width: 75% !important
+    }
+
+    /*.modal-dialog {
+        max-width: 100%;
+        margin: 1.75rem auto;
+    }*/
+    /*.select2-drop {
+        z-index: 99999;
+    }*/
+    .disable-click {
+        pointer-events: none;
+    }
+
+    tfoot {
+        display: table-header-group;
+    }
+</style>
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-11">
+        <h2>
+            Fuel Oil Liquidation Form
+        </h2>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Home")">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a>Fuel Oil Liquidation</a>
+            </li>
+            <li class="breadcrumb-item active">
+                <strong>
+                    Form
+                </strong>
+            </li>
+        </ol>
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>
+                        Form
+                    </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link" href="@Url.Action("Index", "FuelOil")">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <form asp-action="Create" id="frm">
+                        <input type="hidden" id="jLocationCode" value="@ViewBag.defaultLocationCode" />
+                        <p>
+                            @{
+                                @if (ViewBag.Status != "Posted" && ViewBag.Status != "Transferred")
+                                {
+                                    <a href="#" onclick="saveForm(this);" class="anchorAction btn btn-primary btn-bitbucket asave">
+                                        <i class="fa fa-check"></i>
+                                        <span>&nbsp;Save</span>
+                                    </a>
+                                    <a href="#" onclick="postForm(this);" class="anchorAction btn btn-warning btn-bitbucket apost">
+                                        <i class="fa fa-book"></i>
+                                        <span>&nbsp;Post</span>
+                                    </a>
+                                }
+                            }
+
+
+                            <a href="#" id="aPrint" onclick="printForm('@ViewBag.Id','rptLiquidation');" class="anchorAction btn btn-info btn-bitbucket">
+                                <i class="fa fa-print"></i>
+                                <span>&nbsp;Print</span>
+                            </a>
+
+
+                        </p>
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-group row">
+                            <label asp-for="ReferenceNo" class="col-lg-2 col-form-label"></label>
+                            <div class="col-lg-4">
+                                <input asp-for="ReferenceNo" class="form-control" readonly />
+                                <span asp-validation-for="ReferenceNo" class="text-danger"></span>
+                            </div>
+                            <label asp-for="CreatedDate" class="col-lg-2 col-form-label"></label>
+                            <div class="col-lg-4" style="pointer-events:@(ViewBag.GeneratedfromBSmart==true?"none":"auto")">
+
+                                <input id="CreatedDateMain" asp-for="CreatedDate" class="form-control datepicker" type="text" />
+                                <span asp-validation-for="CreatedDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label asp-for="Shift" class="col-lg-2 col-form-label"></label>
+                            <div class="col-lg-4" style="pointer-events:@(ViewBag.GeneratedfromBSmart==true?"none":"auto")">
+
+                                <select asp-for="Shift" class="form-control">
+                                    <option value="Day">Day</option>
+                                    <option value="Night">Night</option>
+
+                                </select>
+                                <span asp-validation-for="Shift" class="text-danger"></span>
+                            </div>
+                            <label asp-for="LubeTruckCode" class="col-lg-2 col-form-label"></label>
+                            <div class="col-lg-4" style="pointer-events:@(ViewBag.GeneratedfromBSmart==true?"none":"auto")">
+                                <select asp-for="LubeTruckCode" class="form-control" asp-items="ViewBag.LubeTruckId"></select>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <label asp-for="DispenserCode" class="col-lg-2 col-form-label"></label>
+                            <div class="col-lg-4" style="pointer-events:@(ViewBag.GeneratedfromBSmart==true?"none":"auto")">
+                                <select asp-for="DispenserCode" class="form-control" asp-items="ViewBag.DispenserId"></select>
+
+                            </div>
+
+                        </div>
+
+                        @if (ViewBag.Status != "Posted" && ViewBag.Status != "Transferred")
+                        {
+                            <button class="btn btn-success dim hidePost" title="Add" type="button" onclick="createNew(this); return false;"><i class="fa fa-plus" data-placement="top" data-toggle="tooltip"></i> Add Equipment</button>
+                        }
+
+
+                        <table id="tbl" class="table table-striped table-no-bordered table-hover dataTable" style="width: 100%!important">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Equipment</th>
+                                    <th>Location</th>
+                                    <th>SMR</th>
+                                    <th>Driver</th>
+                                    <th>Job Card No.</th>
+                                    <th>Sign Status</th>
+                                    <th></th>
+                                    <th style="width:15%;"></th>
+
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Equipment</th>
+                                    <th>Location</th>
+                                    <th>SMR</th>
+                                    <th>Job Card No.</th>
+                                    <th>Sign Status</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal inmodal in " id="modalEquipment" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content animated fadeIn">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modalSnapTitle">Equipment Information</h4>
+                <small class="font-bold">Modify details of this dispenser</small>
+            </div>
+            <div class="modal-body">
+                <p>
+                    @if (ViewBag.Status != "Posted" && ViewBag.Status != "Transferred")
+                    {
+                        <a href="#" title="Save" onclick="saveEquipment();" class="anchorAction btn btn-primary btn-bitbucket hidePost">
+                            <i class="fa fa-check"></i>
+                            <span>&nbsp;Save</span>
+                        </a>
+                        <a href="#" onclick="signItem(this);" title="Sign" class="anchorAction btn btn-warning btn-bitbucket">
+                            <i class="fa fa-pencil"></i>
+                            <span>&nbsp;Sign</span>
+                        </a>
+                    }
+
+
+
+                    <a href="#" title="Close" data-dismiss="modal" class="anchorAction btn btn-danger btn-bitbucket">
+                        <i class="fa fa-times"></i>
+                        <span>&nbsp;Close</span>
+                    </a>
+
+                </p>
+                <div class="row col-xs-10">
+                    <form id="frmEquipment" class="form-horizontal">
+                        <input id="FuelOilId" name="FuelOilId" value="@ViewBag.Id" type="hidden" />
+                        <input id="DetailId" name="Id" type="hidden" />
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">Time</label>
+                                <div class="input-group col-md-6">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <input id="CreatedDate" name="CreatedDate" type="text" class="form-control datepicker">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">SMR</label>
+                                <div class="input-group col-md-6">
+                                    <input type="text" id="SMR" name="SMR" class="form-control" style="text-align:center" onkeydown="NumberOnly(event);" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">Driver</label>
+                                <div class="input-group col-md-10">
+                                    @Html.DropDownList("DriverIdNumber", (SelectList)ViewBag.DriverIdNumber, "", new { style = "width:100%", @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label">Location</label>
+                                <div class="input-group col-md-9" id="div-loc">
+                                    @Html.DropDownList("LocationNo", (SelectList)ViewBag.LocationNo, "", new { style = "width:100%", @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label">Equipment</label>
+                                <div class="input-group col-md-9">
+                                    @Html.DropDownList("EquipmentNo", (SelectList)ViewBag.EquipmentNo, "", new { style = "width:100%", @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label">Job Card No.</label>
+                                <div class="input-group col-md-9">
+                                    <select id="JobCardNo" name="JobCardNo" class="form-control" style="width:100%"> <option value="" selected></option></select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="row">
+                    <form id="frmItem">
+
+                        <input id="SubDetailId" name="Id" type="hidden" />
+                        <div class="form-group">
+                            <script id="ITEMtemplate" type="text/template">
+                                <td class="fieldname" data-fieldname="Id" style="display:none"><input class=" form-control" type="text" style="text-align:center" value="0"></td>
+                                <td class="fieldname" data-fieldname="ItemNo">
+                                    <select class="form-control input-sm cmbNo" name="no[]"></select>
+                                </td>
+
+                                <td class="fieldname" data-fieldname="ComponentCode">
+                                    @Html.DropDownList("components", null, "", new { style = "width:100%", @class = "form-control input-sm cmbComponent", name = "component[]" })
+                                </td>
+                                <td class="fieldname" data-fieldname="VolumeQty"><input onkeydown="NumberOnly(event);" class=" form-control" type="text" placeholder="Volume / Qty" name="volume[]" required style="text-align:center" /></td>
+
+                                <td>
+                                    <button class="remITEM btn btn-danger" type="button"><i class="glyphicon glyphicon-remove"></i></button>
+                                </td>
+                            </script>
+                            <table class="table table-bordered table-hover" id="tblItem">
+                                <thead>
+                                    <tr>
+                                        <th width="5%">#</th>
+                                        <th style="display:none"></th>
+                                        <th width="40%">Item</th>
+                                        <th width="30%">Component</th>
+                                        <th style="text-align:center">Volume / Qty</th>
+                                        <th width="110px">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="p_Item"></tbody>
+                            </table>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal inmodal in " id="modalItem" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content animated fadeIn">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modalSnapTitle">Item Information </h4>
+                <small class="font-bold">Modify details of this Item</small>
+            </div>
+            <div class="modal-body">
+                <button data-dismiss="modal" class="btn btn-default">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal inmodal in " id="modalSignature" tabindex="-1" role="dialog" aria-hidden="true" data-size="modal-lg">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content animated fadeIn">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modalSnapTitle">Capture Signature</h4>
+                <small class="font-bold">Take snapshot of signature</small>
+            </div>
+            <div class="modal-body">
+                <input id="imageReferenceId" type="hidden" />
+                <p>
+
+                    <canvas class="signValue" height="400" id="signature"
+                            style="border:1px solid black"></canvas>
+
+                    <img width="100%" height="400" id="savetarget"
+                         style="border:1px solid black" src="@ViewBag.Signature"><br><br>
+
+                    @if (ViewBag.Status != "Posted" && ViewBag.Status != "Transferred")
+                    {
+                        <button id="clear" class="btn btn-primary hidePost">Create</button>
+                    }
+
+
+
+
+                    <button id="save" class="btn btn-primary signValue">Save</button>
+                    <button id="close" class="btn btn-primary">Close</button>
+                    @*<label class="col-md-2 col-form-label"></label>
+                        <div class="input-group col-md-2">*@
+                    <button type="button" id="btnDigitalSign" class="btn btn-warning">Digital Sign</button>
+                    @*</div>*@
+                </p>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+
+    var searchCol = 0;
+    $('#tbl tfoot th').each(function () {
+        var title = $(this).text();
+        $(this).html('<input  id="searchCol[' + searchCol + ']" type="text" placeholder="Search ' + title + '" style="margin:0;font-size:14px;padding:6px 12px;border:1px solid #e5e6e7;color:inherit; width:100%" />');
+        searchCol++;
+    });
+
+    $(function () {
+        if ('@ViewBag.Status' == 'Posted' || '@ViewBag.Status' == "Transferred") {
+            disableForm();
+        }
+    })
+
+    $('.datepicker').datetimepicker({
+        format: 'm/d/Y H:i',
+        //format: 'mm/dd/YYYY HH:mm',
+        step: 5
+    });
+
+    $("#btnDigitalSign").click(function () {
+
+        //if (!$("#DriverId").val()) {
+        //    $("#DriverId").val(1);
+        //}
+        //alert($("#DriverId").val());
+        //return false;
+
+        if (confirm('This will replace actual signature with digital signature. Continue?')) {
+                $.ajax({
+                    url: "@Url.Action("DigitalSignature")"
+                    , dataType: "json"
+                    , type: "POST"
+                    , data: { id: $("#DetailId").val(), DriverId : $("#DriverId").val() }
+                    , success: function (responsedata) {
+                        if (responsedata.status == "success") {
+
+                            toastr["success"]("Signature saved!", "<b>Success</b> ")
+                            loadDatatable($("#FuelOilId").val(),"Edit");
+
+                        } else {
+                            toastr.options = {
+                                "closeButton": true,
+                                timeOut: 10000,
+                                //extendedTimeOut: 0
+                            };
+
+
+                            toastr["error"](responsedata.message +'</br></br>'+ 'Something wrong with the creation of equipment.')
+                            toastr.options = {
+                                "closeButton": true
+                            }
+                        }
+                    }
+                })
+        }
+
+
+    })
+    //$('.datepickerDate').datetimepicker({
+    //    format: 'm/d/Y',
+    //    timepicker: false,
+    //});
+
+    //$("input[type=text]").keyup(function () {
+    //    $(this).val($(this).val().toUpperCase());
+    //});
+
+
+    </script>
+
+    <script>
+    var FEDiv = $('#p_Item');
+   
+    $(function () {
+        //$('#tbl thead tr:eq(1) th').each(function () {
+
+        //    var title = $(this).text();
+        //    if (title == "") {
+
+        //    } else {
+        //        $(this).html('<input type="search" class="form-control form-control-sm" placeholder="Search ' + title + '" />');
+        //    }
+        //});
+        if ('@ViewBag.Status' != 'Posted' && '@ViewBag.Status' != "Transferred") {
+            loadDatatable('@ViewBag.Id', "Edit");
+
+        } else {
+            loadDatatable('@ViewBag.Id', "View");
+        }
+
+    })
+
+    $("#close").click(function () {
+
+        //showItem($("#DetailId").val());
+
+        $("#modalSignature").modal("hide");
+        $("#modalEquipment").modal("show");
+    })
+
+    function deleteForm() {
+
+
+
+        if ($("#FuelOilId").val() == "0") {
+            toastr["error"]("No data to be deleted")
+            toastr.options = {
+                "closeButton": true,
+                "showDuration": "3000",
+            }
+            return false;
+        }
+        $formid = $("#FuelOilId").val();
+
+        swal({
+                    title: "Delete Form",
+                    text: "This will delete form and any associated data. Proceed?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Proceed",
+                    closeOnConfirm: false
+                }, function () {
+                        $.ajax({
+                            url: "@Url.Action("Delete")",
+                            method: "POST",
+                            dataType: "json"
+                            , data: { id: $formid }
+                            , success: function (responsedata) {
+                                if (responsedata.status == "success") {
+                                    swal("Done!", "Form Deleted", "success");
+
+
+                                    setTimeout("window.location.href='@Url.Action("Index")'", 1000);
+
+                                } else {
+
+                                    toastr["error"](responsedata.message)
+                                    toastr.options = {
+                                        "closeButton": true,
+                                        "showDuration": "3000",
+                                    }
+                                };
+                            }, error: function ($xhr, textStatus, errorThrown) {
+                                toastr["error"](errorThrown, "Error")
+                                toastr.options = {
+                                    "closeButton": true,
+                                    "showDuration": "3000",
+                                }
+                            }
+                        });
+                });
+
+
+    }
+    function printForm($refid,$rpt) {
+        window.open('@Url.Action("printReport2", "Reports")?ReferenceId=' + $refid + '&Report=' + $rpt + '&rptType=PDF');
+    }
+
+    function saveEquipment() {
+        var cnt = 0;
+        //var data = $("#frmEquipment").serializeArray();
+        var data = $('#frmEquipment').serializeArray()
+            .reduce(function (a, x) { a[x.name] = x.value; return a; }, {});
+        data.DispenserCode = $('#DispenserCode').val();
+  
+        var $cdate = moment($("#CreatedDate").val()).format("MM/DD/YYYY HH:mm");
+
+        //var dataDet = $("#frmItem").serializeArray()
+        //    .reduce(function (a, x) { a[x.name] = x.value; return a; }, {});
+
+
+        var dataDet = [];
+        var $rows2 = $('#tblItem >tbody >tr');
+        $rows2.each(function () {
+            var h = {};
+            var $td = $(this).find('td.fieldname');
+            $td.each(function () {
+               // console.log($(this).attr('data-fieldname'));
+                if ($(this).attr('data-fieldname') == 'ItemNo' || $(this).attr('data-fieldname') == 'ComponentCode' || $(this).attr('data-fieldname') == 'LocationCode') {
+                    h[$(this).attr('data-fieldname')] = $(this).children("select").val();
+                }
+                else {
+                    h[$(this).attr('data-fieldname')] = $(this).children("input").val();
+                }
+            });
+            dataDet.push(h);
+        });
+
+
+        $.ajax({
+            url: '@Url.Action("SaveFormDetail")'
+            ,method: "POST"
+            , data: { fvm: data, CDate: $cdate, fvdet: dataDet}
+            ,dataType: 'json'
+            , success: function (responsedata) {
+                if (responsedata.status == "success") {
+                   toastr["success"]("Equipment saved!", "<b>Success</b> ")
+                    $("#DetailId").val(responsedata.message);
+          
+                    loadDatatable($("#FuelOilId").val(), "Edit");
+                    swal("Done!", "Equipment saved", "success");
+                    $("#modalEquipment").modal("hide");
+                    $("#SubDetailId").val(responsedata.message);
+                   // var url = window.location.href = 'Url.Action("Edit")?id=' + responsedata.fuelOilId;
+                   // setTimeout("url" , 2000);
+                   // saveItem();
+
+                } else {
+                    //toastr["error"](responsedata.message)
+                    toastr["error"](responsedata.message + "</br></br>" + "Please fill out all equipment information.")
+                    toastr.options = {
+                        "closeButton": true
+                    }
+                }
+            }
+        })
+    }
+    function showItem(id) {
+
+        //$("#SubDetailId").val(id);
+        //$("#modalItem").modal("show");
+        loadDetails(id);
+    }
+    function createNew(obj) {
+
+        if ($('#ReferenceNo').val() == '') {
+            toastr["error"]("Save Form First", "Error")
+            toastr.options = {
+                "closeButton": true
+            }
+            return false;
+        }
+
+        var $locationCode = '';
+        $action = String($(obj).attr('title'));
+
+
+        if ($action === 'Add') {
+            $locationCode = $('#jLocationCode').val();
+
+            $("#SMR").val("");
+            $('#DetailId').val(0);
+            $("#EquipmentNo").val('').trigger('change');
+            $("#DriverIdNumber").val('').trigger('change');
+            $("#CreatedDate").val(moment(new Date()).format("MM/DD/YYYY HH:mm"));
+            $('#JobCardNo').val('').trigger('change');
+
+            $('#LocationNo').val($locationCode).trigger('change');
+         
+            if ($locationCode == '') {
+                $('#div-loc').css('pointer-events', 'auto');
+            }
+            else {
+                if ($('#LubeTruckCode').val() != '' && $('#DispenserCode').val() == 'N/A') {
+                    $('#div-loc').css('pointer-events', 'auto');
+                }
+                else {
+                    $('#div-loc').css('pointer-events', 'none');
+                }
+           
+            }
+            loadDetails(0);
+        } else {
+
+            $locationCode = $(obj).attr('data-location');
+         
+            $cdate = moment($(obj).attr('data-time')).format("MM/DD/YYYY HH:mm");
+            $('#DetailId').val($(obj).attr('data-id'))
+            $('#SubDetailId').val($(obj).attr('data-id'));
+            $('#CreatedDate').val($cdate);
+
+            $('#EquipmentNo').val($(obj).attr('data-equipment')).trigger('change');
+            $('#DriverIdNumber').val($(obj).attr('data-driver')).trigger('change');
+           
+            var smr = parseFloat($(obj).attr('data-smr')) || 0;
+            $('#SMR').val(smr.toFixed(2))
+
+            if ($(obj).attr('data-jo') != null && $(obj).attr('data-jo') != '' && $(obj).attr('data-jo') != 'null') {
+                $('#JobCardNo')
+                    .find('option')
+                    .remove()
+                    .end()
+                    .append('<option value="' + $(obj).attr('data-jo') + '">' + $(obj).attr('data-jo') + '</option>')
+                    .val($(obj).attr('data-jo'))
+                    .trigger('change');
+            }
+            else {
+                $('#JobCardNo')
+                    .find('option')
+                    .remove()
+                    .end()
+                    .val('')
+                    .trigger('change');
+            }
+          
+            $('#LocationNo').val($locationCode).trigger('change');
+            if ($locationCode == '') {
+                $('#div-loc').css('pointer-events', 'auto');
+            }
+            else {
+
+                if ($('#LubeTruckCode').val() != '' && $('#DispenserCode').val() == 'N/A') {
+
+                    $('#div-loc').css('pointer-events', 'auto');
+                }
+                else {
+                    $('#div-loc').css('pointer-events', 'none');
+                }
+
+            }
+            loadDetails($(obj).attr('data-id'));
+        }
+
+
+
+
+        $("#modalEquipment").modal("show");
+
+
+    }
+    //$("#btnSignature").click(function () {
+    //    if ($('#ReferenceNo').val() == '') {
+    //        toastr["error"]("Save Form First", "Error")
+    //        toastr.options = {
+    //            "closeButton": true
+
+    //        }
+    //        return false;
+    //    }
+    //    $(".signValue").hide();
+    //    $("#savetarget").show();
+
+    //    $("#modalSignature").modal("show");
+
+    //})
+
+    $(function () {
+
+        //$("#CreatedDate").val(moment('DateTime.Now').format("MM/DD/YYYY HH:mm"))
+
+
+        if ($("#ReferenceNo").val() == "") {
+
+            //initiateSelect2();
+        } else {
+            @*$("#EquipmentId").append(new Option("", ""));
+            $("#EquipmentId").append(new Option('@ViewBag.EquipmentName', '@ViewBag.EquipmentId'));
+            $("#EquipmentId").select2({
+                width: '100%',
+                theme: 'bootstrap',
+                    ajax: {
+                        url: "@Url.Action("SearchEquipment", "Equipments")",
+                        dataType: 'json',
+                        delay: 300,
+                        data: function (params) {
+                            return {
+                                q: params.term, // search term
+                                page: params.page
+                            };
+                        },
+                        processResults: function (data, page) {
+                            return {
+                                results: data.items,
+                            };
+                        },
+                        cache: false
+                },
+
+            }).val('@ViewBag.EquipmentId').trigger('change');*@
+
+            //loadDetails();
+        }
+
+
+    })
+
+
+    $(document).on('click', '.addFE', function () {
+        var i = $('#p_Item tr').length + 1;
+        var $tr = $('<tr>').append('<td>' + i + '</td>' + $('#ITEMtemplate').html());
+        FEDiv.append($tr);
+        initiateSelect2()
+
+    })
+    $(document).on('click', '.remITEM', function () {
+        var i = $('#p_Item tr').length;
+        if (i > 1) {
+            $(this).closest('tr').remove();
+        }
+        return false;
+    });
+
+    function loadDatatable($id,$type) {
+        var xx = $type;
+
+        if ($.fn.DataTable.isDataTable('#tbl')) {
+            $('#tbl').DataTable().destroy();
+        }
+
+        var table = $("#tbl").DataTable({
+            select: {
+                style: 'single'
+            },
+            "processing": true,
+            "serverSide": true,
+            "searching": true,
+            "fixedHeader": true,
+            "ajax": {
+                "url": "@Url.Action("getDataDetails")?id="+ $id,
+                "type": "POST",
+                "datatype": "json"
+            },
+            "columns": [
+
+                //{ "data": "createdDate", "name": "CreatedDate", "autoWidth": true },
+                {
+                    data: "createdDate",
+                    name: "CreatedDate",
+                    render: function (data, type, row) {
+
+                        return moment(data).format("MM/DD/YYYY hh:mm A");
+                    }
+                },
+                { "data": "equipmentName", "name": "EquipmentName", "autoWidth": true },
+                { "data": "locationName", "name": "LocationName", "autoWidth": true },
+                {
+                    "data": "smr", "name": "SMR", "autoWidth": true,
+                    render: function (data, type, row) {
+
+                        return data == 0 ? "" : Number(parseFloat(data) || 0).toFixed(2);
+                    }
+                },
+               
+                { "data": "driverIdNumber", "name": "DriverIdNumber", "autoWidth": true },
+                { "data": "jobCardNo", "name": "JobCardNo", "autoWidth": true },
+                { "data": "signStatus", "name": "SignStatus", "autoWidth": true, "visible": false },
+                { "data": "locationNo", "name": "LocationNo", "visible": false },//, "visible": false
+                {
+                    render: function (data, type, row) {
+                        $no = (row.no == "") ? null : row.no;
+                        $name = (row.name == "") ? null : row.name;
+
+                        if (xx == "Edit") {
+                            return ActionBtn = '<div class="btn-group">'
+                                + '<button  title=' + xx + ' data-id=' + row.id + ' data-time=' + row.createdDate + ' data-equipment=' + row.equipmentNo + ' data-equipmentname=' + row.equipmentName + ' data-driver=' + row.driverIdNumber + ' data-drivername=' + row.driverName
+                                + ' data-jo=' + row.jobCardNo + ' data-location=' + row.locationNo + ' data-locationname=' + row.locationName + ' data-smr=' + row.smr + ' class="btn btn-sm btn-primary frm-btndetails-view" type = "button" onclick="createNew(this);return false;"> <i class="fa fa-pencil"></i> Edit</button>'
+                                + '<button class="btn btn-sm btn-danger frm-btndetails-delete" type = "button" onclick="deleteItem(\'' + row.id + '\',\'' + row.equipmentName + '\');return false;"> <i class="fa fa-trash"></i> Delete</button>'
+                                + '</div>';
+
+                        } else {
+                            return ActionBtn = '<div class="btn-group">'
+                                + '<button  title=' + xx + ' data-id=' + row.id + '  data-time=' + row.createdDate + ' data-equipment=' + row.equipmentNo + ' data-equipmentname=' + row.equipmentName + ' data-driver=' + row.driverIdNumber + ' data-drivername=' + row.driverName
+                                +  ' data-jo=' + row.jobCardNo + ' data-location=' + row.locationNo + ' data-locationname=' + row.locationName + ' data-smr=' + row.smr + ' class="btn btn-sm btn-primary frm-btndetails-view" type = "button" onclick="createNew(this);return false;"> <i class="fa fa-pencil"></i> Edit</button>'
+                                + '</div>';
+
+                        }
+                    }, "bSortable": false
+                }
+
+
+
+            ]
+            ,
+            "columnDefs": [{ "orderable": false, "targets": [4] }]
+
+
+        });
+
+        //JRV MOD
+        $('#tbl_length').hide();
+        $(document).on("keyup", '[id ^= "searchCol"]', function (e) {
+          //  if (e.which == 13) {
+                var Id = $(this).attr('id');
+
+                var col = Id.replace(/[^0-9]/g, '');
+
+                table.columns(col).search(this.value).draw();
+            //}
+        });
+
+
+        function searchFunction(e) {
+
+            delay(function () {
+                console.log(e);
+                table.column($(e).parent().index() + ':visible')
+                    .search(e.value)
+                    .draw();
+            }, 100);
+        }
+        $("#tbl_filter").hide();
+
+
+    }
+
+     function deleteItem(id, desc) {
+
+        if (confirm('This will delete item ' + desc + '. Continue?')) {
+            $.ajax({
+            url: "@Url.Action("DeleteEquipment")"
+            , method: "POST"
+            , data: { id: id }
+            , dataType: 'json'
+            , success: function (responsedata) {
+               if (responsedata.status == "success") {
+                   toastr["success"]("Item Deleted","<b>Success</b> ")
+                   loadDatatable('@ViewBag.Id',"Edit");
+
+
+                } else {
+
+                    toastr["error"](responsedata.message)
+                    toastr.options = {
+                        "closeButton": true,
+                        "showDuration": "3000",
+                    }
+                }
+            }
+        })
+
+        }
+    }
+    function signItem() {
+         $id = $("#DetailId").val();
+         $.ajax({
+            url: '@Url.Action("signUrl")'
+            , dataType: "json"
+            , type: "POST"
+             , data: { id: $id }
+            , success: function (responsedata) {
+
+
+                $('#savetarget').attr('src', responsedata.imagedata);
+
+            }
+        })
+        $("#imageReferenceId").val($id);
+        $(".signValue").hide();
+        $("#savetarget").show();
+
+        $("#modalEquipment").modal("hide");
+
+        $("#modalSignature").modal("show");
+
+    }
+
+    function loadDetails(id) {
+
+     
+        $.ajax({
+            url: "@Url.Action("getDataSubDetails", "FuelOil")"
+            , method: "POST"
+            , dataType: 'json'
+            , data: { id: id }
+            , async: false
+            , success: function (responsedata) {
+
+                var SelectedItem = "";
+                var SelectedComponent = "";
+                var $trr = '';
+                $('#p_Item > tr').remove();
+
+
+
+                if (responsedata.data.length > 0) {
+
+
+                    for (var i = 0; i < responsedata.data.length; i++) {
+                        $trr =
+                            '<td class="fieldname" data-fieldname="Id" style="display:none"><input class=" form-control" type="text" style="text-align:center"  value="' + responsedata.data[i].id + '"/></td>'+
+                            '<td class="fieldname" data-fieldname="ItemNo"><select class="form-control input-sm cmbNo" id=cmbNo' + i +' name="no[]"></td>'+
+                        '<td class="fieldname" data-fieldname="ComponentCode"  id = "ConveyorId_' + i + '"></td>' +
+                            '<td class="fieldname" data-fieldname="VolumeQty"><input  onkeydown="NumberOnly(event);" class=" form-control" type="text" style="text-align:center" placeholder="Volume / Qty" name="volume[]" required value="' + responsedata.data[i].volumeQty + '"/></td>'
+
+                        $tdCtr = i == 0 ? '<td  style="vertical-align:middle"><button class="addFE btn btn-success" type = "button"><i class="fa fa-plus"></i></button>&nbsp; <button class="remITEM btn btn-danger" type="button"><i class="glyphicon glyphicon-remove"></i></button></td>':
+                                          '<td  style="vertical-align:middle"><button class="remITEM btn btn-danger" type="button"><i class="glyphicon glyphicon-remove"></i></button></td>'
+
+                        $trr = $trr + $tdCtr;
+                        var $tr = $('<tr>').append('<td>' + (i+1) + '</td>' + $trr);
+                        FEDiv.append($tr);
+
+                        //Item
+                        //  $('#cmbNo' + i).append(new Option("", ""));
+
+                        if ('@ViewBag.Status' == "Posted" || '@ViewBag.Status' == "Transferred") {
+                            disableForm();
+                        }
+
+                        $('#cmbNo' + i).append('<option value="' + responsedata.data[i].no + '" selected="true">' + responsedata.data[i].no + "|" + responsedata.data[i].itemName + '</option>');
+                        SelectedItem = responsedata.data[i].no;
+                       // $('#cmbComponent' + i).append('<option value="' + responsedata.data[i].componentId + '" selected="true">' + responsedata.data[i].componentName + '</option>');
+                        SelectedComponent = responsedata.data[i].componentId;
+
+                        var TempConveyorId = document.createElement("select");
+                        TempConveyorId.className = "form-control cmbComponent";
+                        TempConveyorId.id = 'cmbComponent' + i;
+                        TempConveyorId.NAME = 'cmbComponent' + i;
+                        var option = document.createElement("option");
+                        option.value = '';
+                        option.text = '';
+
+                        TempConveyorId.appendChild(option);
+
+                        var DrilldownSeries = JSON.parse('@Html.Raw(Json.Serialize(ViewBag.components))');
+                        for (var x in DrilldownSeries) {
+                            var option = document.createElement("option");
+                            option.value = DrilldownSeries[x].value;
+                            option.text = DrilldownSeries[x].text;
+
+                            TempConveyorId.appendChild(option);
+                        }
+
+                        $('#ConveyorId_' + i).append(TempConveyorId);
+                        $('#cmbComponent' + i).val(responsedata.data[i].componentId).trigger('change');
+
+
+                         $('#cmbNo' + i).select2({
+                             dropdownParent: $('#modalEquipment .modal-content'),
+                            width: '100%',                          
+                            placeholder: "--- Select Item ---",
+                            ajax: {
+                                url: "@Url.Action("SearchItem")",
+                                dataType: 'json',
+                                delay: 250,
+                                data: function (params) {
+                                    return {
+                                        q: params.term, // search term
+                                        page: params.page
+                                    };
+                                },
+                                processResults: function (data, page) {
+                                    return {
+                                        results: data.items,
+
+                                    };
+                                },
+
+                                cache: false
+                            },
+                            minimumInputLength: 1,
+
+                        }).val(SelectedItem).trigger('change');
+                    }
+
+                } else {
+                   
+                    var i = $('#p_Item tr').length + 1;
+
+                    var x ='<td class="fieldname" data-fieldname="Id" style="display:none"><input class=" form-control" type="text" style="text-align:center"  value="0"/></td>'+
+                        '<td class="fieldname" data-fieldname="ItemNo">' +
+                        '<select class="form-control input-sm cmbNo" name="no[]" id"mbNo0"></select>' +
+                        '</td>' +
+                        '<td class="fieldname" data-fieldname="ComponentCode" id = "ConveyorId_' + i + '"></td>' +
+                        '<td class="fieldname" data-fieldname="VolumeQty"><input  onkeydown="NumberOnly(event);" class=" form-control" type="text" placeholder="Volume / Qty" name="volume[]" required style="text-align:center" /></td>' +
+                        '<td  style="vertical-align:middle">' +
+                        '<button class="addFE btn btn-success" type="button"><i class="fa fa-plus"></i> </button>' +
+                        '</td>';
+                    var $tr = $('<tr>').append('<td>' + i + '</td>' + x);
+                    FEDiv.append($tr);
+
+                    var TempConveyorId = document.createElement("select");
+                    TempConveyorId.className = "form-control cmbComponent";
+                    TempConveyorId.id = 'cmbComponent0';
+
+                    var option = document.createElement("option");
+                    option.value = '';
+                    option.text = '';
+
+                    TempConveyorId.appendChild(option);
+
+                    var DrilldownSeries = JSON.parse('@Html.Raw(Json.Serialize(ViewBag.components))');
+                    for (var x in DrilldownSeries) {
+                        var option = document.createElement("option");
+                        option.value = DrilldownSeries[x].value;
+                        option.text = DrilldownSeries[x].text;
+
+                        TempConveyorId.appendChild(option);
+                    }
+                    $('#ConveyorId_' + i).append(TempConveyorId);
+
+                    initiateSelect2()
+
+                }
+            }
+        })
+    }
+    function saveForm() {
+        var cnt = 0;
+
+        var data = $("#frm").serializeArray();
+
+        $.ajax({
+            url: "@Url.Action("SaveForm")"
+            , method: "POST"
+            , data: data
+            , dataType: 'json'
+             , success: function (responsedata) {
+                 if (responsedata.status == "success") {
+
+                    toastr["success"]("Form saved!", "<b>Success</b> ")
+
+                    $("#ReferenceNo").val(responsedata.message);
+                    //$("#CreatedDateMain").val(moment(responsedata.dt).format("YYYY-MM-DD HH:mm:ss"));
+                    $("#FuelOilId").val(responsedata.refid);
+
+                     document.getElementById('aPrint').setAttribute("onclick", "printForm('" + responsedata.refid + "','rptLiquidation');")
+                     $locationCode = responsedata.locationCode;
+                     $('#jLocationCode').val(responsedata.locationCode);
+
+                } else {
+                    if (responsedata.messagenumber == '-2146232060' ) {
+                        toastr["error"]("Duplicate entry found for Lube Truck or Dispenser Entry")
+                    } else {
+                        toastr["error"](responsedata.message)
+                    }
+
+                    toastr.options = {
+                        "closeButton": true
+                    }
+                }
+            }
+        })
+
+
+    }
+    function saveItem() {
+        var cnt = 0;
+
+        $('#frmItem').find('input').each(function () {
+            if ($(this).prop('required')) {
+                if (!$(this).val()) {
+                    cnt = 1;
+                    $(this).addClass("error-input");
+                } else {
+                    $(this).removeClass("error-input");
+                }
+            }
+        });
+
+        if (cnt > 0) {
+            toastr["error"]("Fill all required fields", "Error")
+            toastr.options = {
+                "closeButton": true,
+                "showDuration": "3000",
+            }
+            return false;
+        }
+
+
+        var data = $("#frmItem").serializeArray();
+
+        $.ajax({
+            url: "@Url.Action("SaveFormSubDetail")"
+            , method: "POST"
+            , data: data
+            , dataType: 'json'
+             , success: function (responsedata) {
+                if (responsedata.status == "success") {
+                    toastr["success"]("Equipment information saved!", "<b>Success</b> ")
+
+                    
+                } else {
+                    toastr["error"](responsedata.message + "</br></br>" + "Please fill out all item information.")
+                    toastr.options = {
+                        "closeButton": true
+                    }
+                }
+            }
+        })
+
+
+    }
+    function postForm() {
+        var cnt = 0;
+        if ($('#ReferenceNo').val() == '') {
+            toastr["error"]("Save Form First", "Error")
+            toastr.options = {
+                "closeButton": true
+
+            }
+            return false;
+        }
+        if ($('#tbl tr').length == 0) {
+            toastr["error"]("No details encoded", "Error")
+            toastr.options = {
+                "closeButton": true
+
+            }
+            return false;
+        }
+         $('#frm').find('input').each(function () {
+            if ($(this).prop('required')) {
+                if (!$(this).val()) {
+                    cnt = 1;
+                    $(this).addClass("error-input");
+                } else {
+                    $(this).removeClass("error-input");
+                }
+            }
+        });
+
+        if (cnt > 0) {
+            toastr["error"]("Fill all required fields", "Error")
+            toastr.options = {
+                "closeButton": true,
+                //"showDuration": "3000",
+            }
+            return false;
+        }
+
+      var data = $('#ReferenceNo').val();
+       swal({
+                    title: "Post Form",
+                    text: "This will post form and any associated data. Posting form cannot be undone. Proceed?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Proceed",
+                    closeOnConfirm: false
+                }, function () {
+                        $.ajax({
+                            url: "@Url.Action("PostForm")",
+                            method: "POST",
+                            dataType: "json"
+                            , data: { referenceNo: data }
+                            , success: function (responsedata) {
+                                if (responsedata.status == "success") {
+                                    swal("Done!", "Form posted!", "success");
+
+                                    //Location.reload();
+                                    disableForm();
+                                    loadDatatable('@ViewBag.Id', "View");
+                                    location.reload();
+
+                                } else {
+
+                                    toastr["error"](responsedata.message)
+                                    toastr.options = {
+                                        "closeButton": true,
+                                        "showDuration": "3000",
+                                    }
+                                };
+                            }, error: function ($xhr, textStatus, errorThrown) {
+                                toastr["error"](errorThrown, "Error")
+                                toastr.options = {
+                                    "closeButton": true,
+                                    "showDuration": "3000",
+                                }
+                            }
+                        });
+                });
+    }
+    function disableForm() {
+        $('#frm').find('input, select, button').each(function () {
+            $(this).attr("disabled", "disabled");
+        });
+
+        $('.addFE').attr("disabled", "disabled");
+        $(".remITEM").attr("disabled", "disabled");
+        $(".anchorAction").attr("style", "pointer-events: none");
+        $("#aPrint").attr("style", "pointer-events: true");
+        $(".hidePost").hide();
+
+        $('.frm-btndetails-view').removeAttr("disabled");
+
+        if ('@User.Identity.GetRoleName()' === 'Admin') {
+            $("#CreatedDateMain").prop("disabled", false);
+            $(".anchorAction").attr("style", "pointer-events: true");
+        }
+
+    }
+    $("#Shift").select2({
+        width: '100%',
+    });
+    $("#DispenserCode").select2({
+        width: '100%',
+        placeholder: "--- Select a Location ---",
+    });
+
+    $("#LubeTruckCode").select2({
+        width: '100%',
+        placeholder: "--- SELECT LUBE TRUCK ---",
+    });
+
+    $("#LocationNo").select2({
+        dropdownParent: $('#modalEquipment .modal-content'),
+        width: '100%',
+        placeholder: "--- Select Location ---",
+    });
+    $("#EquipmentNo").select2({
+        dropdownParent: $('#modalEquipment .modal-content'),
+        width: '100%',
+        placeholder: "--- Equipment ---",
+    }).on('select2:select', function (e) {
+        $("#JobCardNo").val('').trigger('change');
+    });
+
+    $("#DriverIdNumber").select2({
+        dropdownParent: $('#modalEquipment .modal-content'),
+        width: '100%',
+        placeholder: "--- Select Driver ---",
+    });
+
+    function initiateSelect2() {
+
+        $(".cmbNo").select2({
+            dropdownParent: $('#modalEquipment .modal-content'),
+            placeholder: "--- Select Item ---",
+            width: '100%',
+            ajax: {
+                url: "@Url.Action("SearchItem")",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, page) {
+                    return {
+                        results: data.items,
+
+                    };
+                },
+
+                cache: false
+            },
+
+            minimumInputLength: 1,
+
+        });
+    }
+
+    $("#JobCardNo").select2({
+        dropdownParent: $('#modalEquipment .modal-content'),
+        placeholder: "--- Select Item ---",
+      
+        width: '100%',
+        ajax: {
+            url: "@Url.Action("GetJobCardNo")",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term, // search term
+                    s: $('#EquipmentNo').val(), // search term
+                    page: params.page
+                };
+            },
+            processResults: function (data, page) {
+                return {
+                    results: data,
+
+                };
+            },
+
+            cache: false
+    },
+        minimumInputLength: 2,
+        templateSelection: function (repo, container) { // omitted for brevity, see the source of this page
+            // Add custom attributes to the <option> tag for the selected option
+            // container.attr('data-title', repo.title);
+            $(repo.element).attr('data-item', repo.title);
+
+            return repo.text;
+        },
+    });
+    </script>
+
+    <script>
+    const modalWidthSize = $(window).innerWidth() * parseFloat('0.4');
+    const canvasSign = document.getElementById('signature');
+    canvasSign.width = modalWidthSize - 65;
+
+    function windowResize() {
+        $wWidth = $(window).innerWidth() * parseFloat('0.4');
+        canvasSign.width = $wWidth - 75;
+    };
+
+    window.addEventListener('resize', windowResize);
+
+    $(function () {
+
+        var canvas = document.querySelector('#signature');
+        var pad = new SignaturePad(canvas);
+
+        document.getElementById('clear').addEventListener('click', function () {
+            canvas = document.querySelector('#signature');
+            pad = new SignaturePad(canvas);
+            $(".signValue").show();
+            $("#savetarget").hide();
+            pad.clear();
+        });
+
+        $('#accept').click(function () {
+            var data = pad.toDataURL();
+            $('#savetarget').attr('src', data);
+            pad.off();
+        });
+
+        $('#save').click(function () {
+            var data = pad.toDataURL();
+            pad.off();
+
+
+                $.ajax({
+                    url: "@Url.Action("saveSnapShot")?id=" + $("#imageReferenceId").val()
+                    , dataType: "json"
+                    , type: "POST"
+                    , data: { imgData: data }
+                    , success: function (responsedata) {
+                        if (responsedata.status == "success") {
+
+                            toastr["success"]("Signature saved!", "<b>Success</b> ")
+                            loadDatatable($("#FuelOilId").val(),"Edit");
+                            $('#savetarget').attr('src', data);
+                        } else {
+
+                            toastr.options = {
+                                "closeButton": true,
+                                timeOut: 10000,
+                                //extendedTimeOut: 0
+                            };
+                            toastr["error"](responsedata.message +'</br></br>'+ 'Something wrong with the creation of equipment.')
+                            toastr.options = {
+                                "closeButton": true
+                            }
+                        }
+                    }
+                })
+
+             })
+
+    });
+    </script>
+}

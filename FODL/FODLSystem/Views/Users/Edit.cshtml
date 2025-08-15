@@ -1,0 +1,229 @@
+﻿@model FODLSystem.Models.User
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-11">
+        <h2>
+            Edit User Accounts
+        </h2>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index","Home")">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index","Departments")"> User Accounts</a>
+            </li>
+            <li class="breadcrumb-item active">
+                <strong>
+                    Edit
+                </strong>
+            </li>
+        </ol>
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>
+                        List
+                    </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link" href="@Url.Action("Index","Users")">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <form id="frm" asp-action="Edit">
+                        <div class="ibox-content">
+                            <div class="row">
+
+                                <div class="col-md-4">
+
+                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <input type="hidden" asp-for="Id" />
+                                    <div class="form-group">
+                                        <label asp-for="Domain" class="control-label"></label>
+                                        <input asp-for="Domain" class="form-control" disabled />
+                                        <span asp-validation-for="Domain" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="Username" class="control-label"></label>
+                                        <input asp-for="Username" class="form-control" disabled />
+                                        <span asp-validation-for="Username" class="text-danger"></span>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label asp-for="FirstName" class="control-label"></label>
+                                        <input asp-for="FirstName" class="form-control" disabled />
+                                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="LastName" class="control-label"></label>
+                                        <input asp-for="LastName" class="form-control" disabled />
+                                        <span asp-validation-for="LastName" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="Name" class="control-label"></label>
+                                        <input asp-for="Name" class="form-control" disabled />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label asp-for="Email" class="control-label"></label>
+                                        <input asp-for="Email" class="form-control" disabled />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+
+
+
+
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="control-label">Company</label>
+                                        @Html.DropDownList("CompanyId", (IEnumerable<SelectListItem>)ViewData["Company"], "Select Company", new { @class = "form-control" })
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="DepartmentCode" class="control-label"></label>
+                                        @Html.DropDownList("DepartmentCode", (IEnumerable<SelectListItem>)ViewData["Department"], "Select Department", new { @class = "form-control" })
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="RoleId" class="control-label"></label>
+                                        @Html.DropDownList("RoleId", (IEnumerable<SelectListItem>)ViewData["Roles"], "Select Role", new { @class = "form-control" })
+                                        <span asp-validation-for="RoleId" class="text-danger"></span>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label class="control-label">Company Access</label>
+                                        <select id="CompanyAccess" style="width:400px" name="companytags[]" class="form-control">
+                                            <option value="1">SEMIRARA MINING AND POWER CORPORATION</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Lube Access</label>
+                                        <select id="LubeAccess" style="width:400px" name="lubetags[]" class="form-control" asp-items="ViewBag.LubeTruckId"></select>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Dispenser Access</label>
+                                        <select id="DispenserAccess" style="width:400px" name="dispensertags[]" class="form-control" asp-items="ViewBag.DispenserId"></select>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Save" class="btn btn-default" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+    var compAccess = '@Model.CompanyAccess'
+    var lubeAccess = '@Model.LubeAccess'
+    var dispenserAccess = '@Model.DispenserAccess'
+
+    var selectedValuesTest = compAccess.split(',');
+    var lubeTest = lubeAccess.split(',');
+    var dispenserTest = dispenserAccess.split(',');
+
+
+    $(function () {
+
+        $("#UserType").val('@Model.UserType');
+
+    });
+
+    $("#frm").submit(function (e) {
+
+        if ($('#DepartmentCode').val() == "" || $('#DepartmentCode').val() == null) {
+            toastr["error"]("Please fill Company and Department", "Error")
+            toastr.options = {
+                "closeButton": true,
+                "showDuration": "3000",
+            }
+            e.preventDefault();
+        }
+
+    });
+
+    $("#CompanyAccess").select2({
+        multiple: true,
+    });
+    $("#LubeAccess").select2({
+        multiple: true,
+    });
+    $("#DispenserAccess").select2({
+        multiple: true,
+    });
+
+
+
+    $('#CompanyAccess').val(selectedValuesTest).trigger('change');
+    $('#LubeAccess').val(lubeTest).trigger('change');
+    $('#DispenserAccess').val(dispenserTest).trigger('change');
+
+
+    $('#CompanyId').change(function () {
+
+        $.ajax({
+            url: "@Url.Action("ReloadDepartment", "Users")"
+            , method: "POST"
+            , dataType: 'json'
+            , data: { id: $(this).val() }
+            , success: function (responsedata) {
+
+                console.log(responsedata);
+
+                $('#DepartmentId')
+                    .find('option')
+                    .remove()
+                    .end();
+
+                var $select = $('<select name="DepartmentId" style=" width:100% "></select>');
+
+
+                $.each(responsedata, function (k, v) {
+                    var $option = $("<option></option>", {
+                        "text": v["text"],
+                        "value": v["value"]
+                    });
+
+                    //if (d === parseInt(v["value"])) {
+                    //    $option.attr("selected", "selected")
+                    //}
+                    $('#DepartmentId').append($option);
+                });
+
+
+            }
+        })
+
+    });
+
+
+
+
+
+
+
+    </script>
+    }
+

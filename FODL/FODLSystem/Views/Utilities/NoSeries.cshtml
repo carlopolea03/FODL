@@ -1,0 +1,111 @@
+﻿@model IEnumerable<FODLSystem.Models.NoSeries>
+
+<div class="row">
+    <div class="col-xl-12" style="margin-top:40px;">
+        @foreach (var modeleState in ViewData.ModelState.Values)
+        {
+            foreach (var error in modeleState.Errors)
+            {
+                <h5 style="color:red;margin-top:8px;">@error.ErrorMessage</h5>
+            }
+        }
+    </div>
+    <table class="table  table-hover table-bordered" id="tblNoSeries">
+        <thead>
+            <tr>
+                <th style="display:none">Id</th>
+                <th>Code</th>
+                <th>
+                    @Html.DisplayNameFor(model => model.LastNoUsed)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                if (Model == null || Model.Count() == 0)
+                {
+                    <tr>
+                        <td style="display:none" data-fieldname="Id" class="fieldname">0</td>
+                        <td data-fieldname="Code" class="fieldname">FuelOil</td>
+                        <td data-fieldname="LastNoUsed" class="fieldname" contenteditable="true"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td style="display:none" data-fieldname="Id" class="fieldname">0</td>
+                        <td data-fieldname="Code" class="fieldname">FOD Code</td>
+                        <td data-fieldname="LastNoUsed" class="fieldname" contenteditable="true"></td>
+                        <td></td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td style="display:none" data-fieldname="Id" class="fieldname">@item.Id</td>
+                            <td data-fieldname="Code" class="fieldname">@item.Code</td>
+                            <td data-fieldname="LastNoUsed" class="fieldname" contenteditable="true">@Html.DisplayFor(modelItem => item.LastNoUsed)</td>
+                        </tr>
+                    }
+                }
+            }
+
+        </tbody>
+    </table>
+</div>
+<div class="form-group">
+    <button id="btnSaveNoSeries" type="button" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
+</div>
+
+<script>
+    $('#btnSaveNoSeries').click(function () {
+        var data = [];
+        var rowNo = 0;
+        var $rows = $('#tblNoSeries').find("tbody>tr");
+        var fdata = new FormData();
+        var x = 0;
+        $rows.each(function () {
+            var h = {};
+            var $td = $(this).find('td.fieldname');
+            $td.each(function () {
+                    h[$(this).attr('data-fieldname')] = $(this).text();    
+            });
+            data.push(h);
+        });
+      
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("NoSeries", "Utilities")',
+            data: { _noSeries: data },
+           // dataType: 'json',
+            success: function (result) {
+                $('.modal-url-body-small').empty();
+                $('.modal-url-body-small').html(result);
+            }
+        });
+    });
+    $(document).ready(function () {
+        var PageStatus = '@ViewBag.PageStatus';
+
+        if (PageStatus=='OK') {
+            $.confirm({
+                title: 'No. Series! ',
+                content: 'Record has been successfully saved.',
+                autoClose: 'ok|30000',
+                icon: 'fa fa-info-circle',
+                typeAnimated: true,
+                type: 'blue',
+                buttons: {
+                    ok: {
+                        text: 'OK',
+                        btnClass: 'btn btn-success',
+                        action: function () {
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+

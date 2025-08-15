@@ -1,0 +1,174 @@
+﻿
+
+@using FODLSystem.Models.View_Model;
+
+@model LoginViewModel
+@{
+    ViewBag.Title = "LogIn";
+}
+
+@{Layout = null;}
+
+<style>
+    /*body {
+        background-image: url('../assets/semirarataxexcempt.jpg');
+        background-size: cover;
+    }*/
+
+</style>
+<link href="~/css/bootstrap.min.css" rel="stylesheet">
+<link href="~/font-awesome/css/font-awesome.css" rel="stylesheet">
+<link href="~/css/animate.css" rel="stylesheet">
+<link href="~/css/style.css" rel="stylesheet">
+
+<body class="gray-bg">
+    <div class="loginColumns animated fadeInDown">
+        <div class="row">
+
+            <div class="col-md-6">
+                <h1 class="font-bold; green" style="text-align:center">Welcome to <span class="text-navy">FODL System</span> </h1>
+
+                <img alt="image" class="img-responsive" src="~/assets/semirarataxexcempt.jpg" style="width:100%">
+
+            </div>
+            <div class="col-md-6">
+                <div class="ibox-content">
+                    @{
+                        if (System.Environment.MachineName == "HYACINTHUSX" || System.Environment.MachineName == "CRONUS" || System.Environment.MachineName == "WSD2014" || System.Environment.MachineName == "WSN0873")
+                        {
+                            <form class="m-t" role="form" asp-action="Login">
+                                <div asp-validation-summary="All" class="text-danger"></div>
+                                <input type="hidden" name="LogInType" value="AD" />
+                                <div class="form-group">
+                                    <div class="input-group m-b">
+                                        <span class="input-group-addon">@@</span>
+                                        @Html.DropDownList("Domain", new SelectList(Enum.GetValues(typeof(FODLSystem.Models.Domain)), "SMCDACON"), new { @class = "form-control" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group m-b">
+                                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                        <input class="form-control" type="text" placeholder="UserName" asp-for="Username" required="" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group m-b">
+                                        <span class="input-group-addon"> <i class="fa fa-eye-slash " onclick="ShowPassword();" id="iPassword" style="cursor:pointer"></i></span>
+                                        <input class="form-control" type="password" placeholder="Enter Password" asp-for="Password" />
+                                    </div>
+                                </div>
+
+                                <br />
+                                <button type="submit" class="btn btn-primary block full-width m-b">Login</button>
+
+                                <p class="text-muted text-center">
+                                    <small></small>
+                                </p>
+                                <br />
+                            </form>
+                        }
+                        else
+                        {
+                            <form class="m-t" role="form" asp-action="Login">
+                                <div asp-validation-summary="All" class="text-danger"></div>
+                                <input type="hidden" name="LogInType" value="LOCAL" />
+                                <div style="display:none">
+                                    @Html.DropDownList("Domain", new SelectList(Enum.GetValues(typeof(FODLSystem.Models.Domain)), "SEMIRARAMINING"), new { @class = "form-control" })
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group m-b">
+                                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                        <input class="form-control" type="text" placeholder="UserName" asp-for="Username" required="" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group m-b">
+                                        <span class="input-group-addon"> <i class="fa fa-eye-slash " onclick="ShowPassword2();" id="iPassword2" style="cursor:pointer"></i></span>
+                                        <input class="form-control" type="password" placeholder="Enter Password" asp-for="Password" id="Password2" />
+                                    </div>
+                                </div>
+
+                                <br />
+                                <button type="submit" class="btn btn-primary block full-width m-b">Login</button>
+
+                                <p class="text-muted text-center">
+                                    <small></small>
+                                </p>
+                                <br />
+                            </form>
+                        }
+                    }
+
+                    <p class="m-t">
+                        <small>Fuel Oil Liquidation System  &copy; 2022</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                Powered by ICT Dept - System Group
+            </div>
+            <div class="col-md-6 text-right">
+                <small>© 2022</small>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="~/js/jquery-2.1.1.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
+    <script>
+        function ShowPassword() {
+            var x = document.getElementById("Password");
+            if (x.type === "password") {
+                x.type = "text";
+                $('#iPassword').removeClass('fa-eye-slash ');
+                $('#iPassword').addClass('fa-eye');
+            } else {
+                x.type = "password";
+                $('#iPassword').addClass('fa-eye-slash ');
+                $('#iPassword').addClass('fa-eye');
+            }
+        }
+        $('#Password').keyup(function () {
+
+            if ($(this).val() == '') {
+                $('#iPassword').removeClass('fa-eye');
+                $('#iPassword').addClass('fa-eye-slash');
+            }
+            else {
+                $('#iPassword').removeClass('fa-eye-slash');
+                $('#iPassword').addClass('fa-eye');
+            }
+        });
+
+        function ShowPassword2() {
+            var x = document.getElementById("Password2");
+            if (x.type === "password") {
+                x.type = "text";
+                $('#iPassword2').removeClass('fa-eye-slash ');
+                $('#iPassword2').addClass('fa-eye');
+            } else {
+                x.type = "password";
+                $('#iPassword2').addClass('fa-eye-slash ');
+                $('#iPassword2').addClass('fa-eye');
+            }
+        }
+        $('#Password2').keyup(function () {
+
+            if ($(this).val() == '') {
+                $('#iPassword2').removeClass('fa-eye');
+                $('#iPassword2').addClass('fa-eye-slash');
+            }
+            else {
+                $('#iPassword2').removeClass('fa-eye-slash');
+                $('#iPassword2').addClass('fa-eye');
+            }
+        });
+    </script>
+</body>
+
+

@@ -1,0 +1,102 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20220621025934_LocationUpdt.cs" />
+    <Compile Remove="Migrations\20220621025934_LocationUpdt.Designer.cs" />
+    <Compile Remove="Migrations\20220621051501_Updt2.cs" />
+    <Compile Remove="Migrations\20220621051501_Updt2.Designer.cs" />
+    <Compile Remove="Migrations\20220621052727_JRVMod.cs" />
+    <Compile Remove="Migrations\20220621052727_JRVMod.Designer.cs" />
+    <Compile Remove="Migrations\20220621074455_JRVMod5.cs" />
+    <Compile Remove="Migrations\20220621074455_JRVMod5.Designer.cs" />
+    <Compile Remove="Migrations\20220621080715_JRVMod6.cs" />
+    <Compile Remove="Migrations\20220621080715_JRVMod6.Designer.cs" />
+    <Compile Remove="Migrations\20220621083359_JRVMod6.cs" />
+    <Compile Remove="Migrations\20220621083359_JRVMod6.Designer.cs" />
+    <Compile Remove="Migrations\20220621083909_JRVMod6.cs" />
+    <Compile Remove="Migrations\20220621083909_JRVMod6.Designer.cs" />
+    <Compile Remove="Migrations\20220621084003_JRVMod6.cs" />
+    <Compile Remove="Migrations\20220621084003_JRVMod6.Designer.cs" />
+    <Compile Remove="Migrations\20220621090221_JRVMod5.cs" />
+    <Compile Remove="Migrations\20220621090221_JRVMod5.Designer.cs" />
+    <Compile Remove="Migrations\20240207031123_ModFeb.cs" />
+    <Compile Remove="Migrations\20240207031123_ModFeb.Designer.cs" />
+    <Compile Remove="Migrations\20240507014127_UpdateFODL.cs" />
+    <Compile Remove="Migrations\20240507014127_UpdateFODL.Designer.cs" />
+    <Compile Remove="Migrations\20240912070542_UniqRef.cs" />
+    <Compile Remove="Migrations\20240912070542_UniqRef.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspose.Words" Version="21.9.0" />
+    <PackageReference Include="ClosedXML" Version="0.95.4" />
+    <PackageReference Include="DNTBreadCrumb.Core" Version="1.7.0" />
+    <PackageReference Include="EPPlus" Version="5.7.4" />
+    <PackageReference Include="LinqToExcel" Version="2.0.0-PRERELEASE-2" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.9" />
+    <PackageReference Include="NPOI" Version="2.5.4" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="System.DirectoryServices" Version="5.0.0" />
+    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="5.0.0" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.9" />
+    <PackageReference Include="System.ServiceModel.Duplex" Version="4.4.*" />
+    <PackageReference Include="System.ServiceModel.Http" Version="4.4.*" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.4.*" />
+    <PackageReference Include="System.ServiceModel.Security" Version="4.4.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\fileuploads\" />
+    <Folder Include="wwwroot\snapshots\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Views\Locations\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Drivers\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\FuelOil\BSmart.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\FuelOil\BSmartView.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Reports\Index - Copy.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Users\CreateWindowsAccount.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Users\CreateFODUser.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,85 @@
+﻿@model List<FODLSystem.Models.BSmartError>
+
+@{
+    ViewData["Title"] = "BSmartSyncLogs";
+}
+
+<h2>Synchronization Logs</h2>
+
+<div>
+    <a href="#" onclick="ManualSync(); return false;" class="anchorAction btn btn-primary btn-bitbucket asave">
+        <i class="fa fa-download"></i> <span class="email-text">&nbsp; Manual Sync</span>
+    </a>
+    <table id="tbl" class="table table-striped table-no-bordered table-hover dataTable" style="width:50%!important">
+        <thead>
+            <tr>
+                <th style="width:180px"> Date and Time</th>
+                <th> Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                foreach (var d in Model)
+                {
+                    <tr>
+                        <td> @d.ErrorDate.ToString("MM/dd/yyyy hh:mm tt")</td>
+                        <td> @d.ErrMessage</td>
+                    </tr>
+                }
+            }
+        </tbody>
+
+    </table>
+
+</div>
+@section Scripts{
+    <script>
+        function ManualSync() {
+
+        swal({
+            title: "Do you want to manually trigger the BSmart synchronization?",
+            text: "The request will be sent to BSmart",
+            type: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Proceed!",
+            closeOnConfirm: false
+        }, function () {
+            $.ajax({
+                url: "@Url.Action("GetBizMartData")",
+                method: "POST",
+                dataType: "json"
+                , success: function (responsedata) {
+                    if (responsedata.status == "OK") {
+                        swal({
+                            title: "Done!",
+                            text: "",
+                            type: "success"
+                        },
+                            function () {
+                                location.reload();
+                            });
+
+                    } else {
+
+                        toastr["error"](responsedata.message)
+                        toastr.options = {
+                            "closeButton": true,
+                            "showDuration": "3000",
+                        }
+                    };
+                }, error: function ($xhr, textStatus, errorThrown) {
+                    toastr["error"](errorThrown, "Error")
+                    toastr.options = {
+                        "closeButton": true,
+                        "showDuration": "3000",
+                    }
+                }
+            });
+        });
+
+     }
+
+    </script>
+}
+

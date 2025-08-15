@@ -1,0 +1,405 @@
+﻿
+@{
+    ViewData["Title"] = "Summary";
+}
+<style>
+    #tblReference_filter input {
+        width: 80px;
+    }
+    .dataTables_length {
+        display: none;
+    }
+
+</style>
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-11">
+        <h2>
+            Fuel Oil Liquidation Summary
+        </h2>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index","Home")">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a>Fuel Oil Liquidation</a>
+            </li>
+            <li class="breadcrumb-item active">
+                <strong>
+                    Summary
+                </strong>
+            </li>
+        </ol>
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>
+                        List
+                    </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link" href="@Url.Action("Index","Home")">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-sm-3">
+                               <table id="tblReference" class="table table-striped table-no-bordered table-hover dataTable" style="width: 100%!important">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Reference No</th>
+                                        <th>Id</th>
+                                        <th>Dispenser / Lubetruck</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="col-sm-9">
+                            <table style="width:500px">
+                                <tr>
+                                    <td>Batch No. : &nbsp;</td>
+                                    <td><input class="form-control" id="txtBatchNo" type="text" /></td>
+                                    <td style="width:20px"></td>
+                                    <td>
+                                        <a href="#" onclick="uploadNavision();" class="anchorAction btn btn-primary btn-bitbucket">
+                                            <i class="fa fa-upload"></i>
+                                            <span>&nbsp;Upload to Navision</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table id="tbl" class="table table-striped table-no-bordered table-hover dataTable" style="width: 100%!important;">
+                                <thead>
+                                    <tr>
+                                        <th>Reference No</th>
+                                        <th>Entry Type</th>
+                                        <th>Item No.</th>
+                                        <th>Posting Date</th>
+                                        <th>Document Date</th>
+                                        <th>Qty. to Request</th>
+                                        <th>Equipment Nos. Code</th>
+                                        <th>Office Code</th>
+                                        <th>Fuel Code</th>
+                                        <th>Location Code</th>
+                                        <th>Dept. Code</th>
+                                        <th>Job Card No.</th>
+                                    </tr>
+                                </thead>
+
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+
+    </script>
+    <script>
+    var strReference = '';
+    $(function () {
+
+
+
+        $("input[type=text]").keyup(function () {
+            $(this).val($(this).val().toUpperCase());
+        });
+
+        loadDatatable("0");
+        //loadDatatableReference();
+        });
+
+       // var tblReference = $("#tblReference").DataTable();
+        var table = $("#tblReference").DataTable({
+            //select: {
+            //    style: 'multiple'
+            //},
+            "processing": true,
+            "serverSide": true,
+            "searching": true,
+            "fixedHeader": true,
+            "bLengthChange": false,
+            "order": [[2, "desc"]],
+            "ajax": {
+                "url": "@Url.Action("getDataReferenceNo2")",
+                "type": "POST",
+                "datatype": "json"
+            },
+            drawCallback: function () {
+                $('input[type="checkbox"]').iCheck({
+                    checkboxClass: 'icheckbox_square-green',
+                    radioClass: 'iradio_square-green',
+                });
+            },
+               aoColumnDefs: [
+                {
+                    'targets': 0,
+                    'render': function (data, type, row, meta) {
+                        if (type === 'display') {
+
+                            data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
+
+
+                        }
+
+                        return data;
+                    },
+                    'checkboxes': {
+                        'selectRow': true,
+                        'selectCallback': function (nodes, selected) {
+                            $('input[type="checkbox"]', nodes).iCheck('update');
+                        },
+                        'selectAllCallback': function (nodes, selected, indeterminate) {
+                            $('input[type="checkbox"]', nodes).iCheck('update');
+                        }
+                    }
+                },
+
+
+                ],
+            "columns": [
+                {
+                    "data": null //0
+                },
+
+                { "data": "referenceNo", "name": "ReferenceNo", "autoWidth": true },
+                { "data": "id", "class": "idClass", "name": "id", visible:false },
+                { "data": "dispenserCode",  "name": "DispenserCode" },
+            ]
+    });
+
+        $('.dt-checkboxes-select-all').empty();
+        // Handle iCheck change event for "select all" control
+        $(table.table().container()).on('ifChanged', '.dt-checkboxes-select-all input[type="checkbox"]', function (event) {
+
+            //var col = tblTransmit.column($(this).closest('th'));
+            //col.checkboxes.select(this.checked);
+
+            if (this.checked) {
+                $('input.dt-checkboxes:not(.all)').parents('tr').addClass('selected');
+                //dt-checkboxes
+                $('.dt-checkboxes').iCheck('check');
+            }
+            else {
+                $('input.dt-checkboxes:not(.all)').parents('tr').removeClass('selected');
+                $('.dt-checkboxes').iCheck('uncheck');
+            }
+
+        });
+        var jdata = [];
+        // Handle iCheck change event for checkboxes in table body
+        $(table.table().container()).on('ifChanged', '.dt-checkboxes', function (event) {
+            var cell = table.cell($(this).closest('td'));
+
+            cell.checkboxes.select(this.checked);
+            jdata = [];
+            var $irows = $(this).parents('tr');
+            if (this.checked) {
+                $irows.addClass('selected');
+                LoadDetailsData();
+
+            }
+            else {
+                $irows.removeClass('selected');
+                LoadDetailsData();
+            }
+        });
+
+        function LoadDetailsData() {
+            
+            var data = table.rows('.selected').data();
+            for (var i = 0; i < data.length; i++) {
+                //if (strReference != '') {
+                //    strReference += ",";
+                //}
+               // strReference += data[i]['id'];
+                if ($.inArray(data[i]['id'], jdata)) {
+                    // the value is in the array
+                    jdata.push(data[i]['id']);
+                }
+
+            }
+           // if (strReference == '') { strReference = "0" }
+
+            loadDatatable(strReference);
+        }
+    function loadDatatable(refid) {
+        var data = [];
+        if ($.fn.DataTable.isDataTable('#tbl')) {
+            $('#tbl').DataTable().destroy();
+        }
+    
+    
+        $.ajax({
+            url: "@Url.Action("getDataSummary")"
+            , data: { refid: jdata.join()}
+                            , method: "POST"
+                            , dataType: 'json'
+
+                            , success: function (responsedata) {
+
+                                if (responsedata.status == "success") {
+
+
+                                    for (var i = 0; i < responsedata.data.length; i++) {
+
+
+
+                                        data.push([responsedata.data[i].referenceNo,
+                                            responsedata.data[i].entryType, responsedata.data[i].itemNo
+                                            , moment(responsedata.data[i].postingDate).format("MM/DD/YYYY")
+                                            , moment(responsedata.data[i].documentDate).format("MM/DD/YYYY")
+                                            , responsedata.data[i].qty, responsedata.data[i].equipmentCode
+                                            , responsedata.data[i].officeCode, responsedata.data[i].fuelCode
+                                            , responsedata.data[i].locationCode, responsedata.data[i].departmentCode
+                                            ,responsedata.data[i].jobCardNo,
+                                            ]);
+
+                                    }
+
+                                    $('#tbl').DataTable({
+                                        select: {
+                                            style: 'single'
+                                        },
+                                        "data": data,
+                                        "responsive": true,
+                                        "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                                        "columnDefs": [
+
+                                        ],
+                                    });
+                                } else {
+                                    toastr["error"](responsedata.message)
+                                    toastr.options = {
+                                        "closeButton": true
+                                    }
+                                }
+
+                            }
+        });
+
+    }
+
+    function uploadNavision() {
+
+        if ($.trim($("#txtBatchNo").val()) == "") {
+            toastr["error"]("Please fill out batch no.")
+            toastr.options = {
+                "closeButton": true
+            }
+            return false;
+        }
+
+
+       // var table = $('#tbl').DataTable();
+      //  $rowCount = table.data().count();
+
+        //if ($rowCount == 0) {
+        //    toastr["error"]("No data to be uploaded")
+        //    toastr.options = {
+        //        "closeButton": true,
+        //        "showDuration": "3000",
+        //    }
+        //    return false;
+        //}
+
+        if (!confirm('Do you wish to proceed in uploading of data to Navision? This cannot be undone')) {
+            return false;
+        }
+
+         $.ajax({
+                        url: "@Url.Action("uploadNavision","Utilities")"
+                            , method: "POST"
+                            , dataType: 'json'
+             , data: { batchno: $("#txtBatchNo").val(), refid: jdata.join()}
+                            , success: function (responsedata) {
+                                console.log(responsedata);
+                                if (responsedata.status == "success") {
+
+                                
+
+                                    toastr.success(
+                                        "Successfully uploaded to ",
+                                        'Navision',
+                                        {
+                                            timeOut: 200,
+                                            fadeOut: 200,
+                                            onHidden: function () {
+                                                window.location.reload();
+                                            }
+                                        }
+                                    );
+                                    return;
+
+                                  //  loadDatatable();
+                                  // $('#tblReference').DataTable().ajax.reload();
+                                   // window.location.reload();
+
+                                }
+                                else if (responsedata.status == "warning") {
+                                    //toastr.options = {
+                                    //    closeButton: true,
+                                    //    extendedTimeOut: 0,
+                                    //    timeOut: 0,
+                                    //    tapToDismiss: false
+                                    //};
+
+                                    //toastr["warning"]("Some of the items were partially uploaded to Navision. Please see details : <br /><br />" + responsedata.message)
+                                    //toastr.options = {
+                                    //    "closeButton": true
+                                    //}
+
+                                    //loadDatatable();
+                                    //  $('#tblReference').DataTable().ajax.reload();
+                                    toastr.error(
+                                        "Some of the items were partially uploaded to Navision. Please see details : <br /><br />" ,
+                                        responsedata.message,
+                                        {
+                                            timeOut: 200,
+                                            fadeOut: 200,
+                                            onHidden: function () {
+                                                window.location.reload();
+                                            }
+                                        }
+                                    );
+
+                                }
+                                else {
+
+                                    //toastr.options = {
+                                    //    closeButton: true,
+                                    //    extendedTimeOut: 0,
+                                    //    timeOut: 0,
+                                    //    tapToDismiss: false
+                                    //};
+
+                                    toastr["error"](responsedata.message)
+                                    toastr.options = {
+                                        "closeButton": true
+                                    }
+
+                                    loadDatatable();
+                                    //loadDatatableReference();
+                                }
+                               
+                            }
+        });
+    }
+
+    </script>
+}
+
+

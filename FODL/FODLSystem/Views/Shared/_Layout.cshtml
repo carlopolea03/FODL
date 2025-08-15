@@ -1,0 +1,202 @@
+﻿@*@using Microsoft.AspNetCore.Http*@
+@*@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor*@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>@ViewData["Title"]</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="@Url.Content("~/images/fav.ico")">
+    <link rel="icon" type="image/x-icon" href="@Url.Content("~/images/fav.ico")">
+    @{ await Html.RenderPartialAsync("_CSS");}
+    @RenderSection("Styles", required: false)
+
+    <style>
+        /*.wrapper{
+            overflow:auto;
+        }*/
+        .number-field {
+            text-align: center;
+        }
+
+        .center-field {
+            text-align: center;
+        }
+
+        .form-horizontal .control-label {
+            text-align: left;
+        }
+
+        .dropdown-usermenu {
+            z-index: 9999999999;
+        }
+
+        [class^='select2'] {
+            border-radius: 0px !important;
+        }
+
+        table.dataTable tbody tr.selected {
+            color: white !important;
+            background-color: #1ABB9C !important;
+        }
+
+        input[readonly] {
+            background-color: transparent !important;
+        }
+
+        textarea[readonly] {
+            background-color: transparent !important;
+        }
+
+
+        .select2-selection--single {
+            height: 100% !important;
+        }
+
+        .select2-selection__rendered {
+            word-wrap: break-word !important;
+            text-overflow: inherit !important;
+            white-space: normal !important;
+        }
+    </style>
+</head>
+<body class="md-skin pace-done fixed-sidebar">
+    <!-- Left side column. contains the sidebar -->
+    <partial name="_LeftNavigation" />
+    <div id="wrapper" style="overflow:hidden">
+        <div id="page-wrapper" class="gray-bg">
+            <!-- Top -->
+            <partial name="_LayoutTop" />
+            <!-- Content Wrapper. Contains page content -->
+            <div id="wait" style="display: none; width: 100%; height: 100%; top: 100px; left: 0px; position: fixed; z-index: 99999999; text-align: center;">
+                <img src="~/images/preload_waiting.gif" width="145" height="145" alt="Processing..." style="position: fixed; top: 50%; left: 50%;" />
+            </div>
+            @RenderBody()
+            <!-- Footer -->
+            <partial name="_Footer" />
+        </div>
+    </div>
+    <div class="modal center fade modal-url" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-url" role="document" style="width:500px">
+            <div class="modal-content  animated fadeIn">
+                <div class="modal-header">
+                    <h2 class="modal-title modal-url-title"></h2>
+                </div>
+                <div class="modal-body modal-url-body" style="overflow:hidden"></div>
+            </div>
+        </div>
+    </div>
+    @{await Html.RenderPartialAsync("_JS");}
+    @RenderSection("Scripts", required: false)
+    @{
+        if (TempData["APPError"] != null)
+        {
+            <script>
+                 $.notify({
+                        title: '<strong>Error! </strong>',
+                        message: '@TempData["APPError"]'
+                    },
+                    {
+                        type: 'warning'
+                    });
+            </script>
+        }
+        else if (TempData["APPSuccess"] != null)
+        {
+            <script>
+                 $.notify({
+                        title: '',
+                        message: '@TempData["APPSuccess"]'
+                    },
+                    {
+                        type: 'success'
+                    });
+
+
+            </script>
+        }
+    }
+</body>
+</html>
+<script>
+
+
+    function AllowNumberOnly(event) {
+
+        if ((event.which >= 48 && event.which <= 57) || (event.which >= 96 && event.which <= 105) || event.which == 8 || event.keyCode == 9 || event.keyCode == 110 || event.keyCode == 190) {
+        }
+        else
+            event.preventDefault();
+    };
+    function NumberOnly(event) {
+        if ((event.which >= 48 && event.which <= 57) || (event.which >= 96 && event.which <= 105) || event.which == 8 || event.keyCode == 9) {
+        }
+        else
+            event.preventDefault();
+    };
+    function numberToCurrency(number, decimalSeparator, thousandsSeparator, nDecimalDigits) {
+
+        //default values
+        decimalSeparator = decimalSeparator || '.';
+        thousandsSeparator = thousandsSeparator || ',';
+        nDecimalDigits = nDecimalDigits == null ? 2 : nDecimalDigits;
+
+        var fixed = number.toFixed(nDecimalDigits), //limit/add decimal digits
+
+            parts = new RegExp('^(-?\\d{1,3})((?:\\d{3})+)(\\.(\\d{' + nDecimalDigits + '}))?$').exec(fixed); //separate begin [$1], middle [$2] and decimal digits [$4]
+
+        if (parts) { //number >= 1000 || number <= -1000
+            return parts[1] + parts[2].replace(/\d{3}/g, thousandsSeparator + '$&') + (parts[4] ? decimalSeparator + parts[4] : '');
+        } else {
+            return fixed.replace('.', decimalSeparator);
+        }
+    }
+    $(".DateInput").datepicker({
+        format: "mm/dd/yyyy",
+        autoclose: true,
+    });
+</script>
+<script>
+
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $('#wait').show();
+        });
+        $(document).ajaxStop(function () {
+            $('#wait').hide();
+        });
+        $(document).ajaxComplete(function () {
+            $("#wait").hide();
+        });
+    });
+
+        function ShowNoSeries() {
+            $('.modal-url').addClass('center');
+            $('.modal-url-body').empty();
+            $('.modal-url-body').html('');
+            $('.modal-url-title').html('<a><i class="fa fa-arrow-circle-left" data-dismiss="modal"></i></a> &nbsp;No. Series');
+            $('.modal-url-body').load('@Url.Action("NoSeries", "Utilities")');
+            $('.modal-url').modal({ show: true });
+        }
+        function AllowNumberOnly(event) {
+
+            if ((event.which >= 48 && event.which <= 57) || (event.which >= 96 && event.which <= 105) || event.which == 8 || event.keyCode == 9 || event.keyCode == 110 || event.keyCode == 190) {
+            }
+            else
+                event.preventDefault();
+        };
+        function NumberOnly(event) {
+            if ((event.which >= 48 && event.which <= 57) || (event.which >= 96 && event.which <= 105) || event.which == 8 || event.keyCode == 9) {
+            }
+            else
+                event.preventDefault();
+        };
+
+        $(".SelectBox").select2({
+            width: '100%',
+            theme: 'bootstrap',
+            placeholder: "Select a Location",
+        });
+</script>

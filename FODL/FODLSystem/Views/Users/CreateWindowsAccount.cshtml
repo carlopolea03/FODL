@@ -1,0 +1,166 @@
+﻿@model FODLSystem.Models.View_Model.DomainUserViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-11">
+        <h2>
+            Create User Accounts
+        </h2>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index","Home")">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index","Departments")"> User Accounts</a>
+            </li>
+            <li class="breadcrumb-item active">
+                <strong>
+                    Create
+                </strong>
+            </li>
+        </ol>
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>
+                        Form
+                    </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link" href="@Url.Action("Index","Users")">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <form asp-action="CreateWindowsAccount">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-group">
+                            <label asp-for="Domain" class="control-label"></label>
+                            <select asp-for="Domain" class="form-control" asp-items="ViewBag.Domain"></select>
+                            <span asp-validation-for="Domain" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Username" class="control-label"></label>
+                            <select asp-for="Username" class="form-control" id="DomainUserName">
+                                <option disabled></option>
+                            </select>
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Firstname" class="control-label"></label>
+                            <input asp-for="Firstname" class="form-control" />
+                            <span asp-validation-for="Firstname" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Lastname" class="control-label"></label>
+                            <input asp-for="Lastname" class="form-control" />
+                            <span asp-validation-for="Lastname" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Email" class="control-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Lastname" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="DepartmentCode" class="control-label"></label>
+                            <select asp-for="DepartmentCode" class="form-control" asp-items="ViewBag.DepartmentId"></select>
+                        </div>
+                        <div>
+                            <label asp-for="RoleId" class="control-label"></label>
+                            <select asp-for="RoleId" class="form-control" asp-items="ViewBag.RoleId"></select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label">Lube Access</label>
+                            <select id="LubeAccess" style="width:400px" name="lubetags[]" class="form-control" asp-items="ViewBag.LubeTruckId"></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Dispenser Access</label>
+                            <select id="DispenserAccess" style="width:400px" name="dispensertags[]" class="form-control" asp-items="ViewBag.DispenserId"></select>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="submit" value="Create" class="btn btn-success" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+<script>
+    $("#LubeAccess").select2({
+        multiple: true,
+    });
+    $("#DispenserAccess").select2({
+        multiple: true,
+    });
+
+    $("#Domain").select2({
+        width: '100%'
+    }).on('change', function (e) {
+        $('#DomainUserName').empty();
+        $("#DomainUserName").val("").trigger("change");
+    });
+    $("#DomainUserName").select2({
+                placeholder: "--- Username ---",
+                width: '100%',
+                ajax: {
+                    url: '@Url.Action("GetDomainUser", "Users")',
+                    dataType: 'json',
+                    type: 'GET',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            q: params.term, // search
+                            d: $('#Domain').val(),
+                            page: params.page
+                        };
+                    },
+                    processResults: function (data) {
+
+                        // parse the results into the format expected by Select2.
+                        // since we are using custom formatting functions we do not need to
+                        // alter the remote JSON data
+                        return {
+                            results: data
+                        };
+
+                    },
+                    cache: false
+                },
+                minimumInputLength: 3,
+                templateSelection: function (repo, container) { // omitted for brevity, see the source of this page
+                    // Add custom attributes to the <option> tag for the selected option
+                    // container.attr('data-title', repo.title);
+                    $(repo.element).attr('data-item', repo.title);
+                    return repo.text;
+                },
+            }).on("select2:select", function(event) {
+                var index_id = Number(this.id.replace(/[^0-9]/g, ''));
+
+                var custom_attribute = $(this).find(':selected').data('item');
+
+                var _data = custom_attribute.split('^');
+              
+                $('.select2-selection').removeAttr('Style');
+                $('#Name').val(_data[0]);
+                $('#Firstname').val(_data[1]);
+                $('#Lastname').val(_data[2]);
+            });
+
+</script>
+}
+

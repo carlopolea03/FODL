@@ -1,0 +1,326 @@
+﻿@{
+    ViewData["Title"] = "List";
+}
+<style>
+    tfoot {
+        display: table-header-group;
+    }
+    .dataTables_length {
+        display: none;
+    }
+</style>
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-11">
+        <h2>
+            Items
+        </h2>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index","Home")">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                Option Settings
+            </li>
+            <li class="breadcrumb-item active">
+                <strong>
+                    List
+                </strong>
+            </li>
+        </ol>
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>
+                        List
+                    </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link" href="@Url.Action("Index","Home")">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    @*<a href="#" onclick="Sync(); return false;" title="Synchronize to NAV" class="anchorAction btn btn-success btn-bitbucket">
+                        <i class="fa fa-refresh"></i>
+                        <span>&nbsp;Synchronize to NAV</span>
+                    </a>*@
+                    <table id="tbl" class="table table-striped table-no-bordered table-hover dataTable" style="width: 100%!important">
+                        <thead>
+                            <tr>
+                                <th>Item No</th>
+                                <th>Description</th>
+                                <th>Description 2</th>
+                                <th>Description in Liquidation</th>
+                                <th>Description in Liquidation 2</th>
+                                <th>Type of Fuel</th>
+
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Item No</th>
+                                <th>Description</th>
+                                <th>Description 2</th>
+                                <th>Description in Liquidation</th>
+                                <th>Description in Liquidation 2</th>
+                                <th>Type of Fuel</th>
+
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal inmodal in " id="modalItem" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content animated fadeIn">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modalSnapTitle">Item Information </h4>
+                <small class="font-bold">Modify details of this item</small>
+            </div>
+            <div class="modal-body">
+                <input id="itemId" type="hidden" />
+
+                <div class="form-group">
+                    <label>No</label>
+                    <input class="form-control" id="itemNo" disabled />
+                </div>
+                <div class="form-group">
+
+                    <label>Description</label>
+                    <input class="form-control" id="itemDescription" disabled />
+                </div>
+                <div class="form-group">
+                    <label>Description 2</label>
+                    <input class="form-control" id="itemDescription2" disabled />
+                </div>
+                <div class="form-group">
+                    <label>Type of Fuel</label>
+                    @*<input class="form-control" id="itemItemFuel" />*@
+                    <select class="form-control" id="itemItemFuel">
+                        <option value="DIESEL">DIESEL</option>
+                        <option value="OIL-LUBE">OIL-LUBE</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description in Liquidation</label>
+                    @*<input class="form-control" id="itemDescriptionLiquidation" />*@
+                    <select class="form-control" id="itemDescriptionLiquidation">
+                        <option value="DIESOLINE">DIESOLINE</option>
+                        <option value="30">30</option>
+                        <option value="15W40">15W40</option>
+                        @*<option value="PTT30">PTT30</option>*@
+                        <option value="10">10</option>
+                        <option value="68">68</option>
+                        <option value="PTT50">PTT50</option>
+                        <option value="140">140</option>
+                        <option value="EP 2">EP 2</option>
+                        <option value="COOLANT">COOLANT</option>
+                        <option value="90">90</option>
+                        <option value="150">150</option>
+                        <option value="220">220</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description in Liquidation 2</label>
+                    <input class="form-control" id="itemDescriptionLiquidation2" />
+                </div>
+                <button data-dismiss="modal" class="btn btn-default">Close</button>
+                <button id="btnSave" class="btn btn-primary" onclick="saveItem();">Save</button>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+    function saveItem() {
+        $id = $("#itemId").val();
+        $typeFuel = $("#itemItemFuel").val();
+        $descLiq = $("#itemDescriptionLiquidation").val();
+        $descLiq2 = $("#itemDescriptionLiquidation2").val();
+        $.ajax({
+                url: "@Url.Action("SaveItem")"
+                    , method: "POST"
+            , data: { id: $id, TypeFuel: $typeFuel, DescLiq: $descLiq, DescLiq2: $descLiq2 }
+                    , dataType: 'json'
+                    , success: function (responsedata) {
+                        if (responsedata.status == "success") {
+                            toastr["success"]("Data saved!", "<b>Success</b> ")
+                            loadDatatable();
+                        } else {
+                            toastr["error"](responsedata.message)
+                            toastr.options = {
+                                "closeButton": true,
+                                "showDuration": "3000",
+                            }
+                        }
+                    }
+               })
+
+
+    }
+    $(function () {
+
+        var searchCol = 0;
+        $('#tbl tfoot th').each(function () {
+
+            var title = $(this).text();
+            if (title == "") {
+
+            } else {
+                $(this).html('<input  id="searchCol[' + searchCol + ']" type="text" placeholder="Search ' + title + '" style="margin:0;font-size:14px;padding:6px 12px;border:1px solid #e5e6e7;color:inherit; width:100%" />');
+                searchCol++;
+            }
+            searchCol++;
+        });
+        loadDatatable();
+    })
+
+    function loadDatatable() {
+
+
+        if ($.fn.DataTable.isDataTable('#tbl')) {
+            $('#tbl').DataTable().destroy();
+        }
+
+        var table = $("#tbl").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "searching": true,
+            "fixedHeader": true,
+            "ajax": {
+                "url": "@Url.Action("getData")",
+                "type": "POST",
+                "datatype": "json"
+            },
+            "columns": [
+                //{
+                //    data: "fileDate",
+                //    name: "FileDate",
+                //    render: function (data, type, row) {
+                //        return moment(data).format("MM-DD-YYYY");
+                //    }
+                //},
+                { "data": "no", "name": "No", "autoWidth": true },
+                { "data": "description", "name": "Description", "autoWidth": true },
+                { "data": "description2", "name": "Description2", "autoWidth": true },
+                { "data": "descriptionLiquidation", "name": "DescriptionLiquidation", "autoWidth": true },
+                { "data": "descriptionLiquidation2", "name": "DescriptionLiquidation2", "autoWidth": true },
+                { "data": "typeFuel", "name": "TypeFuel", "autoWidth": true },
+                {
+                    //data-no=' + row.no + ' data - desc=' + row.description + ' data - desc2=' + row.description2 + ' data - descliq=' + row.descriptionLiquidation + ' data - type=' + row.typeFuel +
+                    render: function (data, type, row) {
+
+                        $desc = (row.description == "") ? null : row.description;
+                        $desc2 = (row.description2 == "") ? null : row.description2;
+                        $descliq = (row.descriptionLiquidation == "") ? null : row.descriptionLiquidation;
+                        $descliq2 = (row.descriptionLiquidation2 == "") ? null : row.descriptionLiquidation2;
+                        $type = (row.typeFuel == "") ? null : row.typeFuel;
+
+
+                        $actions =
+                            "<a title='Edit' data-id=" + row.id + " data-no=" + row.no + " data-desc='" + $desc + "' data-desc2='" + $desc2 + "' data-descliq='" + $descliq + "' data-descliq2='" + $descliq2 + "' data-type='" + $type + "' onclick='showmodal(this);'>Edit</a>";
+
+                        return $actions;
+                    }
+                }
+
+
+            ]
+            //,
+            //"columnDefs": [{ "orderable": false, "targets": [1, 2, 3] }]
+
+
+        });
+
+
+        $(document).on("keyup", '[id ^= "searchCol"]', function (e) {
+            if (e.which == 13) {
+                var Id = $(this).attr('id');
+
+                var col = Id.replace(/[^0-9]/g, '');
+
+                table.columns(col).search(this.value).draw();
+            }
+        });
+
+        function searchFunction(e) {
+
+            delay(function () {
+                table.column($(e).parent().index() + ':visible')
+                    .search(e.value)
+                    .draw();
+            }, 1000);
+        }
+        $("#tbl_filter").hide();
+    }
+
+    var delay = (function () {
+        var timer = 0;
+        return function (callback, ms) {
+            clearTimeout(timer);
+            timer = setTimeout(callback, ms);
+        };
+    })();
+
+    function showmodal(obj) {
+        $id = $(obj).attr('data-id');
+        $no = $(obj).attr('data-no');
+        $desc = $(obj).attr('data-desc');
+        $desc2 = $(obj).attr('data-desc2') == "null" ? "" : $(obj).attr('data-desc2');
+        $descliq = $(obj).attr('data-descliq') == "null" ? "" : $(obj).attr('data-descliq');
+        $descliq2 = $(obj).attr('data-descliq2') == "null" ? "" : $(obj).attr('data-descliq2');
+        $type = $(obj).attr('data-type') == "null" ? "" : $(obj).attr('data-type');
+
+        console.log(obj);
+        $("#itemId").val($id);
+        $("#itemNo").val($no);
+        $("#itemDescription").val($desc);
+        $("#itemDescription2").val($desc2);
+        $("#itemItemFuel").val($type);
+        $("#itemDescriptionLiquidation").val($descliq);
+        $("#itemDescriptionLiquidation2").val($descliq2);
+
+
+
+
+        $('#modalItem').modal('show');
+
+
+    }
+
+    function Sync() {
+        $.ajax({
+            type: 'POST',
+            url: "@Url.Action("GetItem")",
+            dataType: "json",
+            success: function (data) {
+
+                if (data.status == "OK") {
+                    location.reload();
+                }
+                else {
+                    alert(data.message);
+                }
+
+            }
+        });
+    }
+
+
+    </script>
+    }

@@ -1,0 +1,507 @@
+﻿
+
+@{
+    ViewData["Title"] = "BSmart Data";
+}
+
+<style>
+    tfoot {
+        display: table-header-group;
+    }
+    /* Mimic table appearance */
+    #fileuploaddiv.table {
+        display: table;
+    }
+
+        #fileuploaddiv.table .file-row {
+            display: table-row;
+            display: table-row;
+        }
+
+            #fileuploaddiv.table .file-row > #fileuploaddiv {
+                display: table-cell;
+                vertical-align: top;
+                border-top: 1px solid #ddd;
+                padding: 8px;
+            }
+
+            #fileuploaddiv.table .file-row:nth-child(odd) {
+                background: #f9f9f9;
+            }
+
+
+
+    /* The total progress gets shown by event listeners */
+    #total-progress {
+        opacity: 0;
+        transition: opacity 0.3s linear;
+    }
+
+    /* Hide the progress bar when finished */
+    #previews .file-row.dz-success .progress {
+        opacity: 0;
+        transition: opacity 0.3s linear;
+    }
+
+    /* Hide the delete button initially */
+    #previews .file-row .delete {
+        display: none;
+    }
+
+    /* Hide the start and cancel buttons and show the delete button */
+
+    #previews .file-row.dz-success .start,
+    #previews .file-row.dz-success .cancel {
+        display: none;
+    }
+
+    #previews .file-row.dz-success .delete {
+        display: block;
+    }
+
+    .error_response {
+        color: red;
+    }
+
+    .success_response {
+        color: darkgreen;
+    }
+
+    #tblAdmin_filter {
+        display: none;
+    }
+
+    tfoot input {
+        width: 100%;
+        padding: 3px;
+        box-sizing: border-box;
+    }
+
+    tfoot {
+        display: table-header-group;
+    }
+
+    table tr:hover {
+        cursor: pointer;
+    }
+    /* For all tables*/
+    table.sortable tr:hover {
+        cursor: pointer;
+    }
+</style>
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-11">
+        <h2>
+            BSmart Data
+        </h2>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index","Home")">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a> BSmart Data </a>
+            </li>
+            <li class="breadcrumb-item active">
+                <strong>
+                    List
+                </strong>
+            </li>
+        </ol>
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>
+                        List
+                    </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link" href="@Url.Action("Index","Home")">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <p class="button-container">
+                        <a class="btn btn-success btn-bitbucket" title="Transfer" href="#" onclick="TransferDataToDataEntry(); return false;">
+                            <i class="fa fa-send"></i> <span class="email-text">&nbsp;Transfer to Data Entry</span>
+                        </a>
+                    </p>
+                    <div style="float:right">
+                        <input type="checkbox" style="margin-left:10px" id="chkAllData" @(ViewBag.alldata == 1 ? "checked='checked'" : "") /> Include Transferred
+                    </div>
+
+                    <table id="tblAdmin" class="table table-striped table-bordered table-hover dataTable reponsive" style="width: 100%!important">
+
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th>No</th>
+                                <th>FODL Reference No.</th>
+                                <th>Created By</th>
+                                <th>Date Created</th>
+                                <th>Transferred Date</th>
+                                <th>Shift</th>
+                                <th>LubeTruck Code</th>
+                                <th>Dispenser Code</th>
+                                <th style="width:50px">Action</th>
+
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th class="hideme"></th>
+                                <th class="hideme"></th>
+                                <th style="margin:0;padding:0">No</th>
+                                <th style="margin:0;padding:0">FODL Reference No.</th>
+                                <th style="margin:0;padding:0">Created By</th>
+                                <th style="margin:0;padding:0">Date Created</th>
+                                <th style="margin:0;padding:0">Transferred Date</th>
+                                <th style="margin:0;padding:0">Shift</th>
+                                <th style="margin:0;padding:0">LubeTruck Code</th>
+                                <th style="margin:0;padding:0">Dispenser Code</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="itemsModal" class="modal inmodal in" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content animated fadeIn">
+            <div class="modal-header">
+
+                <h4 class="modal-title">Files</h4>
+                <small class="font-bold">List of files to be uploaded</small>
+            </div>
+            <div class="modal-body" id="fileuploaddiv">
+                <div id="actions" class="row">
+                    <div class="col-lg-7">
+
+                        <span class="btn btn-success fileinput-button dz-clickable">
+                            <i class="glyphicon glyphicon-plus"></i>
+                            <span>Add files...</span>
+                        </span>
+                        <button type="submit" class="btn btn-primary start" style="display:none;">
+                            <i class="fa fa-upload"></i>&nbsp;
+                            <span>Start upload</span>
+                        </button>
+                        <button type="reset" class="btn btn-warning cancel" style="display:none;">
+                            <i class="glyphicon glyphicon-ban-circle"></i>
+                            <span>Cancel upload</span>
+                        </button>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <!-- The global file processing state -->
+                        <div class="fileupload-process">
+                            <div id="total-progress" class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress=""></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table table-striped files" id="previews">
+                    <div id="template" class="file-row dz-image-preview">
+                        <!-- This is used as the file preview template -->
+                        <div>
+                            <span class="preview"><img data-dz-thumbnail></span>
+                        </div>
+                        <div>
+                            <p class="name" data-dz-name></p>
+                            <strong class="error text-danger" data-dz-errormessage></strong>
+                        </div>
+                        <div>
+                            <p class="size" data-dz-size></p>
+                            <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress></div>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary start" onclick="setstatId();">
+                                <i class="glyphicon glyphicon-upload"></i>
+                                <span>Start</span>
+                            </button>
+                            <button data-dz-remove class="btn btn-warning cancel">
+                                <i class="glyphicon glyphicon-ban-circle"></i>
+                                <span>Cancel</span>
+                            </button>
+                            <label class="delete dropinfo"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+
+                <div class="card-body" style="padding:0px!important;">
+
+
+
+                    <button type="button" id="btnCloseItems" class="btn btn-default" data-dismiss="modal" onclick="location.reload();">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script src="~/vendors/js/plugins/iCheck/icheck.min.js"></script>
+    <script src="~/vendors/js/plugins/dataTables/dataTables.checkboxes.min.js"></script>
+    <script>
+
+    $(document).on("ifChanged", "#chkAllData", function () {
+         if (this.checked) {
+            location.href = "@Url.Action("BSmart","FuelOil",new { f=1})";
+        }
+         else {
+
+             location.href = "@Url.Action("BSmart","FuelOil",new { f=0})";
+        }
+    })
+    $('#btnAdd').click(function () {
+        $("#itemsModal").modal('show')
+    })
+
+
+
+
+    //function loadDatatableAdmin() {
+
+    var searchCol = 0;
+    $('#tblAdmin tfoot th').each(function () {
+        var title = $(this).text();
+        if (!$(this).hasClass("hideme")) {
+            $(this).html('<input  id="searchCol[' + searchCol + ']" type="text" placeholder="Search ' + title + '" style="margin:0;font-size:14px;padding:6px 12px;border:1px solid #e5e6e7;color:inherit; width:100%" />');
+
+        }
+        searchCol++;
+    });
+
+        var table = $("#tblAdmin").DataTable({
+            //select: {
+            //    style: 'multiple'
+            //},
+            "processing": true,
+            "serverSide": true,
+            "searching": true,
+            "fixedHeader": true,
+            "bLengthChange": false,
+            "order": [[2, "desc"]],
+            "ajax": {
+                "url": "@Url.Action("getBSmartData")?f=@ViewBag.alldata",
+                "type": "POST",
+                "datatype": "json"
+            },
+            drawCallback: function () {
+                $('input[type="checkbox"]').iCheck({
+                    checkboxClass: 'icheckbox_square-green',
+                    radioClass: 'iradio_square-green',
+                });
+            },
+               aoColumnDefs: [
+                {
+                    'targets': 0,
+                    'render': function (data, type, row, meta) {
+                        if (type === 'display') {
+
+                            if (row.sourceReferenceNo == '' || row.sourceReferenceNo == null) {
+                                data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
+                            }
+                            else {
+                                data = '<div class="checkbox"><input type="checkbox" class="jdt-checkboxes" disabled><label></label></div>';
+                                }
+
+
+                        }
+
+                        return data;
+                    },
+                    'checkboxes': {
+                        'selectRow': true,
+                        'selectCallback': function (nodes, selected) {
+                            $('input[type="checkbox"]', nodes).iCheck('update');
+                        },
+                        'selectAllCallback': function (nodes, selected, indeterminate) {
+                            $('input[type="checkbox"]', nodes).iCheck('update');
+                        }
+                    }
+                },
+
+
+                ],
+            "columns": [
+                {
+                    "data": null //0
+                },
+                { "data": "id", "class": "idClass", "name": "id", "visible": false },
+                { "data": "referenceNo", "name": "ReferenceNo", "autoWidth": true },
+                { "data": "sourceReferenceNo", "name": "SourceReferenceNo", "autoWidth": true },
+                { "data": "createdBy", "name": "CreatedBy", "autoWidth": true },
+                {
+                    data: "createdDate",
+                    name: "CreatedDate",
+                    render: function (data, type, row) {
+
+                        return moment(data).format("MM/DD/YYYY hh:mm A");
+                    }
+                },
+                {
+                    data: "transferDate",
+                    name: "TransferDate",
+                    render: function (data, type, row) {
+
+                        return moment(data).format("MM/DD/YYYY hh:mm A");
+                    }
+                },
+                { "data": "shift", "name": "Shift", "autoWidth": true, },
+                { "data": "lubeTruckName", "name": "LubeTruckName", "autoWidth": true },
+                { "data": "dispenserName", "name": "DispenserName", "autoWidth": true },
+
+                {
+                     render: function (data, type, row) {
+                         var linkEdit = "@Url.Action("BSmartView", "FuelOil")?id=" + row.id;
+
+                         return '<a title="View" class="btn btn-dark btn-bitbucket" href="' + linkEdit + '"><i class="fa fa-file-o"></i></a> ';
+                    }, "bSortable": false
+                }
+            ]
+            ,
+            "columnDefs": [{ "orderable": false, "targets": [6] }]
+
+
+    });
+        // Handle iCheck change event for "select all" control
+        $(table.table().container()).on('ifChanged', '.dt-checkboxes-select-all input[type="checkbox"]', function (event) {
+
+            //var col = tblTransmit.column($(this).closest('th'));
+            //col.checkboxes.select(this.checked);
+
+            if (this.checked) {
+                $('input.dt-checkboxes:not(.all)').parents('tr').addClass('selected');
+                //dt-checkboxes
+                $('.dt-checkboxes').iCheck('check');
+            }
+            else {
+                $('input.dt-checkboxes:not(.all)').parents('tr').removeClass('selected');
+                $('.dt-checkboxes').iCheck('uncheck');
+            }
+
+        });
+
+        // Handle iCheck change event for checkboxes in table body
+        $(table.table().container()).on('ifChanged', '.dt-checkboxes', function (event) {
+            var cell = table.cell($(this).closest('td'));
+
+            cell.checkboxes.select(this.checked);
+
+            var $irows = $(this).parents('tr');
+            if (this.checked) {
+                $irows.addClass('selected');
+            }
+            else {
+                $irows.removeClass('selected');
+            }
+        });
+
+        $('#tblAdmin tbody').on('dblclick', 'tr', function () {
+            var data = table.row(this).data();
+            if (data != undefined) {
+                var linkEdit = "@Url.Action("BSmartView", "FuelOil")?id=" + data['id'];
+                location.href = linkEdit;
+            }
+        });
+
+        $(document).on("keyup", '[id ^= "searchCol"]', function (e) {
+            if (e.which == 13) {
+                var Id = $(this).attr('id');
+
+                var col = Id.replace(/[^0-9]/g, '');
+
+                table.columns(col).search(this.value).draw();
+            }
+        });
+
+        $("#tbl_filter").hide();
+
+
+
+    function TransferDataToDataEntry() {
+        var fdata = [];
+        var data = table.rows('.selected').data();
+        for (var i = 0; i < data.length; i++) {
+
+           fdata.push(data[i]['id']);
+        }
+
+        if (fdata.length == 0) {
+
+            toastr["error"]("Please select item")
+            toastr.options = {
+                "closeButton": true,
+                "showDuration": "3000",
+            }
+            return;
+        }
+
+        swal({
+            title: "Do you want to transfer the Highlighted rows to Fuel Oil Liquidation?",
+            text: "The request will be sent to Data Entry.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Proceed!",
+            closeOnConfirm: false
+        }, function () {
+
+
+            $.ajax({
+                url: "@Url.Action("TransferDataToDataEntry")",
+                method: "POST",
+                dataType: "json"
+                , data: { id: fdata }
+                , success: function (responsedata) {
+                    if (responsedata.status == "OK") {
+
+                        swal({
+                            title: "Done!",
+                            text: "Form Transferred",
+                            type: "success"
+                        },
+                            function () {
+                                location.reload();
+                            });
+
+                    } else {
+
+                        toastr["error"](responsedata.message)
+                        toastr.options = {
+                            "closeButton": true,
+                            "showDuration": "3000",
+                        }
+                    };
+                }, error: function ($xhr, textStatus, errorThrown) {
+                    toastr["error"](errorThrown, "Error")
+                    toastr.options = {
+                        "closeButton": true,
+                        "showDuration": "3000",
+                    }
+                }
+            });
+        });
+
+     }
+
+
+
+    </script>
+}

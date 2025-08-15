@@ -1,0 +1,82 @@
+﻿
+@{
+
+    var jcontroller = ViewContext.RouteData.Values["Controller"];
+    var jaction = ViewContext.RouteData.Values["Action"];
+}
+
+<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar-collapse">
+        <ul class="nav metismenu" id="side-menu">
+            <li class="nav-header">
+                <div class="dropdown profile-element">
+                    <img alt="image" class="rounded-circle" src="~/images/avatars/avatar5.png" style="  border-radius: 50%;">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                        <span class="block m-t-xs font-bold">@User.Identity.GetFullName()</span>
+                        <span class="text-muted text-xs block">@User.Identity.GetRoleName()<b class="caret"></b></span>
+                    </a>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                        <li>
+                            <form asp-area="" asp-controller="Accounts" asp-action="LogOff" method="post" id="logoutForm"></form>
+                            <a href="javascript:document.getElementById('logoutForm').submit()">Log Out</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="logo-element">
+                    FODL
+                </div>
+            </li>
+            <li @(jcontroller.ToString() == "Home" && jaction.ToString() == "Index" ? "class=special_link" : "")>
+                <a href="@Url.Action("Index", "Home")"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboard</span></a>
+            </li>
+            <li class="active">
+                <a href="index.html"><i class="fa fa-strikethrough"></i> <span class="nav-label">Fuel Oil Liquidation</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse in" aria-expanded="true">
+                    <li @(jcontroller.ToString() == "FuelOil" && jaction.ToString() == "Index" ? "class=special_link" : "")><a href="@Url.Action("Index","FuelOil")"><i class="fa fa-plus"></i>Data Entry</a></li>
+
+                    @{
+                        if (System.Environment.MachineName == "HYACINTHUSX" || System.Environment.MachineName == "CRONUS" || System.Environment.MachineName == "WSD2014" || System.Environment.MachineName == "WSN0873")
+                        {
+                            <li @(jcontroller.ToString() == "FuelOil" && jaction.ToString() == "BSmart" ? "class=special_link" : "")><a href="@Url.Action("BSmart","FuelOil",new { f=0 })"><i class="fa fa-exchange"></i>B.Smart Data</a></li>
+                        }
+                    }
+
+                    <li @(jcontroller.ToString() == "FuelOil" && jaction.ToString() == "Summary" ? "class=special_link" : "")><a href="@Url.Action("Summary","FuelOil")"><i class="fa fa-list"></i>Summary</a></li>
+                </ul>
+            </li>
+            <li @(jcontroller.ToString() == "Utilities" && jaction.ToString() == "Synchronize" ? "class=special_link" : "")><a asp-area="" asp-controller="Utilities" asp-action="Synchronize"><i class="fa fa-send"></i>Synchronize</a></li>
+            <li @(jcontroller.ToString() == "Reports" && jaction.ToString() == "Index" ? "class=special_link" : "")>
+                <a asp-area="" asp-controller="Reports" asp-action="Index"><i class="fa fa-line-chart"></i> <span class="nav-label">Reports</span></a>
+            </li>
+            @if (User.Identity.GetRoleName() != "User")
+            {
+                @if (User.Identity.GetRoleName() == "Admin")
+                {
+                    <li @(jcontroller.ToString() == "Settings" ? "class=special_link" : "")>
+                        <a href="#" aria-expanded="false"><i class="fa fa-cog"></i> <span class="nav-label">Option Settings</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level collapse" aria-expanded="false">
+                            <li><a asp-area="" asp-controller="Companies" asp-action="Index"><i class="fa fa-building"></i>Companies</a></li>
+                            <li><a asp-area="" asp-controller="Departments" asp-action="Index"><i class="fa fa-list-alt"></i>Departments</a></li>
+                            <li><a asp-area="" asp-controller="Users" asp-action="Index"><i class="fa fa-group"></i>Users </a></li>
+                            <li><a asp-area="" asp-controller="Items" asp-action="Index"><i class="fa fa-book"></i>Items </a></li>
+                            <li><a asp-area="" asp-controller="Components" asp-action="Index"><i class="fa fa-toggle-off"></i>Components </a></li>
+                            <li><a asp-area="" asp-controller="Dispensers" asp-action="Index"><i class="fa fa-align-right"></i>Dispensers </a></li>
+                            <li><a asp-area="" asp-controller="Equipments" asp-action="Index"><i class="fa fa-angle-left"></i>Equipments </a></li>
+                            <li><a asp-area="" asp-controller="LubeTrucks" asp-action="Index"><i class="fa fa-level-up"></i>Lube Trucks </a></li>
+                            <li><a asp-area="" asp-controller="Drivers" asp-action="Index"><i class="fa fa-truck"></i>Drivers </a></li>
+                            <li><a asp-area="" asp-controller="Locations" asp-action="Index"><i class="fa fa-building"></i>Locations </a></li>
+                            <li><a asp-area="" asp-controller="FuelOil" asp-action="BSmartSynchronizationLogs"><i class="fa fa-adjust"></i>BSmart Sync Logs </a></li>
+                            <li>
+                                <a href="javascript:void(0)" onclick="ShowNoSeries(); return false;" style="color:grey">
+                                    <div>
+                                        <i class="fa fa-sort-numeric-asc"></i>&nbsp; No. Series
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+</nav>

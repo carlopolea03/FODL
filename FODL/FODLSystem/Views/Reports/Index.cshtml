@@ -1,0 +1,161 @@
+﻿
+@{
+    ViewData["Title"] = "Summary";
+}
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-11">
+        <h2>
+            Reports
+        </h2>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index","Home")">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a>Fuel Oil Liquidation</a>
+            </li>
+            <li class="breadcrumb-item active">
+                <strong>
+                    Reports
+                </strong>
+            </li>
+        </ol>
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>
+                        Available Reports
+                    </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link" href="@Url.Action("Index","Home")">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <ul class="list-group clear-list m-t">
+                        <li class="list-group-item fist-item">
+                            <span class="float-right">
+
+                            </span>
+                            <span class="label label-success">1</span> <a class="text-navy" href="#" data-toggle="modal" data-target="#modalDaily" data-backdrop="static" data-keyboard="false"> DAILY FUEL & LUBE CONSUMPTION</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal inmodal " id="modalDaily" tabindex="-1" role="dialog" aria-hidden="true" data-size="modal-lg">
+    <div class="modal-dialog">
+        <div class="modal-content animated fadeIn">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modalSnapTitle"> DAILY CONSUMPTION</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Shift</label>
+                    <select class="form-control" id="cmbShift" style="width:150px">
+                        <option value=""></option>
+                        <option value="Day">Day</option>
+                        <option value="Night">Night</option>
+                    </select>
+                </div>
+
+                <table>
+                    <tr>
+                        <td width=":45%">
+                            <div class="form-group">
+                                <label>Lube Truck</label>
+                                <br />
+                                <select class="form-control" asp-items="ViewBag.LubeTruckId" id="cmblubetruckid"><option value=""></option></select>
+                            </div>
+                        </td>
+                        <td style="width:10%;text-align:center">-</td>
+                        <td width=":45%">
+                            <div class="form-group">
+                                <label>Dispenser</label>
+                                <br />
+                                <select class="form-control" asp-items="ViewBag.DispenserId" id="cmbdispenserid"><option value=""></option></select>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width=":45%">
+                            <div class="form-group">
+                                <label>Date From</label>
+                                <br />
+                                <input type="text" class="form-control datetimepicker" id="fromDate" />
+                            </div>
+                        </td>
+                        <td style="width:10%;text-align:center">-</td>
+                        <td width=":45%">
+                            <div class="form-group">
+                                <label>To</label>
+                                <br />
+                                <input type="text" class="form-control datetimepicker" id="toDate" />
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-white" data-dismiss="modal">Close</button>
+                <button class="btn btn-success" onclick="ShowReport('PDF'); return false;">Preview</button>
+                <button class="btn btn-primary" onclick="ShowReport('Excel'); return false;">Excel</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+    var strReference = '';
+    var sqlCommand = '';
+    var sdate = "";
+    var edate = "";
+    $('.datetimepicker').datetimepicker({
+        format: 'm-d-Y H:i',
+    });
+
+    var d = new Date();
+
+    var month = d.getMonth() + 1;
+    var day = d.getDate();
+
+    var output =
+        (month < 10 ? '0' : '') + month + '-' +
+        (day < 10 ? '0' : '') + day + '-' +
+        d.getFullYear();
+
+    $("#fromDate").val(output + " 12:01");
+    $("#toDate").val(output + " 23:59");
+    function ShowReport($type) {
+        if ($('#fromDate').val() == '') {
+            toastr["error"]("Date from is required.")
+            toastr.options = {
+                "closeButton": true
+            }
+            return;
+        }
+        if ($('#toDate').val() == '') {
+            toastr["error"]("Date To is required.")
+            toastr.options = {
+                "closeButton": true
+            }
+            return;
+        }
+        window.open('@Url.Action("printReport", "Reports")?fromDate=' + $('#fromDate').val() + "&toDate=" + $('#toDate').val() + "&lube=" + $("#cmblubetruckid").val() + "&disp=" + $("#cmbdispenserid").val() + '&rptType=' + $type + '&Report=rptLiquidationSummary&shift=' + $('#cmbShift').val());
+        //window.open('Url.Action("printReport", "Reports")?shift=' + $('#cmbShift').val() + "&lube=" + $("#cmblubetruckid").val() + "&disp=" + $("#cmbdispenserid").val() + '&fromDate=' + $('#fromDate').val() + "&toDate=" + $('#toDate').val() + '&rptType=' + $type + '&Report=rptLiquidationAll');//rptLiquidationSummary
+    }
+
+    </script>
+}
+
